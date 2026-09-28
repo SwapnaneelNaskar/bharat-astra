@@ -1,9 +1,10 @@
 # ⚡ BharatCart - Premium E-Commerce Platform (Assignment 5)
 > **Online Shopping Cart with 114+ Products, Flipkart/Amazon Interface, GST Calculation Engine & useReducer**
 
-🌐 **Live Website Deployment:** [https://sohan231001102178.github.io/online-shopping-cart/](https://sohan231001102178.github.io/online-shopping-cart/)  
-📦 **GitHub Repository:** [https://github.com/Sohan231001102178/online-shopping-cart](https://github.com/Sohan231001102178/online-shopping-cart)  
-👤 **Author / Student:** Sohan Ghosh (`Sohan231001102178`)
+🌐 **Live Website Deployment:** [https://sohanghosh2308-creator.github.io/online-shopping-cart/](https://sohanghosh2308-creator.github.io/online-shopping-cart/)  
+📦 **GitHub Repository:** [https://github.com/sohanghosh2308-creator/online-shopping-cart](https://github.com/sohanghosh2308-creator/online-shopping-cart)  
+👤 **Author / Student:** Sohan Ghosh (`sohanghosh2308-creator`)  
+✉️ **Email:** `swapnaneelnaskar2903@gmail.com`
 
 ---
 
