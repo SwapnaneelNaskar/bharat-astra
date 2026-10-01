@@ -1,8 +1,8 @@
 # ⚡ BharatCart - Next-Gen E-Commerce & Service Ecosystem
 > **Enterprise-Grade Shopping & Service Platform: FitVerse 3D Sizing Engine, 20,000+ SKU Catalog Architecture, Unified Booking (Travel & Cinema), and 18% GST Calculation Engine**
 
-🌐 **GitHub Repository:** [https://github.com/sohanghosh2308-creator/online-shopping-cart](https://github.com/sohanghosh2308-creator/online-shopping-cart)  
-👤 **User / Customer:** Sohan Ghosh (`sohanghosh@bharatcart.in`)  
+🌐 **GitHub Repository:** [https://github.com/swapnaneelnaskar2308-creator/online-shopping-cart](https://github.com/swapnaneelnaskar2308-creator/online-shopping-cart)  
+👤 **User / Customer:** Swapnaneel Naskar (`swapnaneelnaskar2903@gmail.com`)  
 ✉️ **Email:** `swapnaneelnaskar2903@gmail.com`  
 🎨 **Design Framework:** Soft Neutral Matte (`#F4F6F9`) + Frosted Glassmorphism (`backdrop-filter: blur(12px)`)  
 💰 **Currency & Tax:** Indian Rupees (`₹`) | 18% GST (CGST 9% + SGST 9%)
@@ -76,7 +76,7 @@ Seamlessly check out physical retail merchandise alongside travel and leisure bo
   6. `Total GST (18%) = CGST + SGST`
   7. `Delivery Fee = ₹0 (FREE over ₹999)`
   8. `Grand Total = Taxable Base + Total GST + Delivery`
-- **Official GST Tax Invoice:** Generates a printable, compliant invoice addressed to **Sohan Ghosh** (`GSTIN: 19AAACG0821M1ZX`).
+- **Official GST Tax Invoice:** Generates a printable, compliant invoice addressed to **Swapnaneel Naskar** (`GSTIN: 19AAACG0821M1ZX`).
 - **Percentage Discount Coupons:**
   - `FESTIVE20` (20% OFF)
   - `TECH25` (25% OFF)
