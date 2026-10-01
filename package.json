@@ -1,0 +1,21 @@
+{
+  "name": "bharatcart-nextgen",
+  "version": "2.0.0",
+  "description": "BharatCart - Next-Gen E-Commerce & Service Ecosystem with FitVerse 3D Engine, 20,000+ SKU Catalog & Unified Booking",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "serve": "node server.js",
+    "test": "node --check index.html"
+  },
+  "keywords": [
+    "ecommerce",
+    "shopping-cart",
+    "fitverse",
+    "gst-calculator",
+    "nextgen"
+  ],
+  "author": "Swapnaneel Naskar <swapnaneelnaskar2903@gmail.com>",
+  "license": "MIT"
+}

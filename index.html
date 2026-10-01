@@ -296,12 +296,247 @@
             margin-left: 4px;
         }
         .gst-calc-nav-btn {
-            background: linear-gradient(135deg, #059669, #10b981);
-            color: white !important;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%) !important;
+            color: #0f172a !important;
+            border: 2px solid #fde68a !important;
+            border-radius: var(--radius-full);
+            font-size: 0.84rem;
+            font-weight: 800;
+            padding: 0.48rem 1.15rem;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.45);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+        .gst-calc-nav-btn i {
+            color: #78350f !important;
+            font-size: 1rem;
+        }
+        .gst-calc-nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.7);
+            filter: brightness(1.08);
+        }
+        .floating-gst-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #0f172a;
+            border: 2px solid #fde68a;
+            padding: 0.75rem 1.4rem;
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: var(--transition-normal);
+        }
+        .floating-gst-btn i {
+            font-size: 1.1rem;
+            color: #78350f;
+        }
+        .floating-gst-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 32px rgba(245, 158, 11, 0.7);
+        }
+
+        /* FitVerse Selective Garment Wardrobe Shelf */
+        .fitverse-garment-shelf {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            margin-bottom: 1.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .garment-type-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 0.75rem 0 1rem;
+        }
+        .garment-filter-tab {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            padding: 0.35rem 0.85rem;
             border-radius: var(--radius-full);
             font-size: 0.8rem;
             font-weight: 700;
-            padding: 0.45rem 0.95rem;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .garment-filter-tab:hover {
+            background: #e2e8f0;
+            color: var(--primary);
+        }
+        .garment-filter-tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+        }
+        .garment-cards-scroll {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.75rem;
+            scroll-behavior: smooth;
+        }
+        .garment-card-tile {
+            flex: 0 0 190px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .garment-card-tile:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        .garment-card-tile.active {
+            border-color: var(--primary);
+            background: #f5f3ff;
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+        .garment-card-tile img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+        }
+        .garment-tile-brand {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .garment-tile-name {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--secondary);
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 0.35rem;
+        }
+        .garment-tile-price {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: auto;
+        }
+        .garment-active-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Amazon & Flipkart Multi-Category Shelves */
+        .shelf-container {
+            margin-bottom: 2.5rem;
+        }
+        .shelf-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1.5px solid rgba(226, 232, 240, 0.8);
+        }
+        .shelf-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .deals-strip {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border: 1.5px solid #fed7aa;
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            margin-bottom: 2.25rem;
+        }
+        .deals-countdown {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #ea580c;
+            color: white;
+            padding: 0.35rem 0.85rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Pagination Controls */
+        .pagination-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 2.5rem;
+            flex-wrap: wrap;
+        }
+        .page-btn {
+            min-width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--secondary);
+            font-size: 0.88rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            padding: 0 0.75rem;
+        }
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #f8fafc;
+        }
+        .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+        }
+        .page-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
         }
         .user-pill {
             display: flex;
@@ -1138,7 +1373,7 @@
 
                 <!-- DEDICATED GST CALCULATION BUTTON (Only GST Calculation as specified) -->
                 <button class="nav-btn gst-calc-nav-btn" onclick="openGstModal()" title="View Indian GST Calculation Breakdown">
-                    <i class="fa-solid fa-calculator"></i> <span>GST (18%)</span>
+                    <i class="fa-solid fa-calculator"></i> <span>GST Calculator (18%)</span>
                 </button>
 
                 <!-- USER PILL: SWAPNANEEL NASKAR -->
@@ -1297,6 +1532,7 @@
         // 2. CENTRAL STATE & useReducer IMPLEMENTATION
         // ============================================================
         const ActionTypes = {
+            SET_PAGE: 'SET_PAGE',
             ADD_TO_CART: 'ADD_TO_CART',
             REMOVE_FROM_CART: 'REMOVE_FROM_CART',
             UPDATE_QUANTITY: 'UPDATE_QUANTITY',
@@ -1314,8 +1550,82 @@
             PLACE_ORDER: 'PLACE_ORDER'
         };
 
+
+        // ============================================================
+        // PROCEDURAL MASSIVE CATALOG GENERATOR (20,480 SKUs Architecture)
+        // ============================================================
+        function generateMassiveSKUs(baseProducts) {
+            const TARGET_COUNT = 20480;
+            const colors = ['Midnight Black', 'Glacial Silver', 'Deep Navy', 'Alpine White', 'Forest Green', 'Sunset Amber', 'Space Gray', 'Crimson Red', 'Rose Gold', 'Matte Titanium'];
+            const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+            const storages = ['128GB', '256GB', '512GB', '1TB'];
+            const packs = ['500g', '1kg', '2kg', '5kg Value Pack', 'Twin Combo Pack (2 x 1kg)'];
+
+            const catalog = [];
+            // Include all curated base products first
+            for (let i = 0; i < baseProducts.length; i++) {
+                const bp = baseProducts[i];
+                catalog.push({
+                    ...bp,
+                    skuCode: 'SKU-' + (catalog.length + 1).toString().padStart(5, '0')
+                });
+            }
+
+            let cycle = 0;
+            while (catalog.length < TARGET_COUNT) {
+                for (let i = 0; i < baseProducts.length; i++) {
+                    if (catalog.length >= TARGET_COUNT) break;
+                    const base = baseProducts[i];
+                    const seed = cycle * baseProducts.length + i;
+                    const color = colors[seed % colors.length];
+                    const skuNum = (catalog.length + 1).toString().padStart(5, '0');
+
+                    let variantName = base.name;
+                    let variantPrice = base.price;
+                    let variantMrp = base.originalPrice || Math.round(base.price * 1.25);
+
+                    if (base.category.includes('Tech') || base.category.includes('Mobiles') || base.category.includes('Laptops')) {
+                        const stor = storages[seed % storages.length];
+                        const multiplier = (seed % storages.length) * 0.12;
+                        variantPrice = Math.round(base.price * (1 + multiplier));
+                        variantMrp = Math.round(variantPrice * 1.22);
+                        variantName = base.name.replace(/\(.*?\)/g, '').trim() + ' (' + stor + ', ' + color + ')';
+                    } else if (base.category.includes('Fashion')) {
+                        const sz = sizes[seed % sizes.length];
+                        variantName = base.name.replace(/\(.*?\)/g, '').trim() + ' - ' + color + ' (Size ' + sz + ')';
+                    } else if (base.category.includes('Groceries')) {
+                        const pk = packs[seed % packs.length];
+                        const mult = [0.6, 1.0, 1.85, 4.2, 1.9][seed % 5];
+                        variantPrice = Math.round(base.price * mult);
+                        variantMrp = Math.round(variantPrice * 1.2);
+                        variantName = base.name.replace(/\(.*?\)/g, '').trim() + ' - ' + pk;
+                    } else {
+                        variantName = base.name + ' - ' + color + ' Edition';
+                    }
+
+                    catalog.push({
+                        ...base,
+                        id: 'sku-' + skuNum,
+                        skuCode: 'SKU-' + skuNum,
+                        name: variantName,
+                        price: variantPrice,
+                        originalPrice: variantMrp,
+                        rating: +(3.8 + ((seed * 7) % 12) / 10).toFixed(1),
+                        reviews: 45 + (seed * 31) % 4800,
+                        stock: 3 + (seed % 35)
+                    });
+                }
+                cycle++;
+            }
+            return catalog;
+        }
+
+        const ALL_MASSIVE_SKUS = generateMassiveSKUs(PRODUCTS_DATABASE);
+
         const initialCartState = {
-            products: PRODUCTS_DATABASE,
+            products: ALL_MASSIVE_SKUS,
+            currentPage: 1,
+            pageSize: 24,
             cart: [],
             appliedCoupon: null,
             gstRate: 0.18,
@@ -1338,6 +1648,8 @@
 
         function cartReducer(state, action) {
             switch (action.type) {
+                case ActionTypes.SET_PAGE:
+                    return { ...state, currentPage: action.payload.page };
                 case ActionTypes.ADD_TO_CART: {
                     const { product, quantity = 1, options = {} } = action.payload;
                     // Support bookings or unique variant options
@@ -1584,13 +1896,52 @@
             }
         }
 
-        // HOME VIEW
+        // HOME VIEW - FLIPKART & AMAZON MULTI-CATEGORY SHELVES
         function renderHomePage() {
             const categories = [
                 'All', 'Mobiles & Tablets', 'Laptops & Computers', 'Home & Kitchen',
                 'Groceries & FMCG', "Men's Fashion", "Women's Fashion", 'Audio & Wearables', 'Sports & Fitness'
             ];
-            const featuredProducts = state.products.slice(0, 12);
+
+            // If a specific category is selected on homepage, show its filtered catalog
+            if (state.selectedCategory !== 'All') {
+                const categoryProducts = state.products.filter(p => p.category === state.selectedCategory);
+                return `
+                    <div class="category-scroll-container">
+                        ${categories.map(cat => `
+                            <button class="category-pill-btn ${state.selectedCategory === cat ? 'active' : ''}" 
+                                    onclick="filterByCategory('${cat}')">
+                                <i class="${getCategoryIcon(cat)}"></i> ${cat}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="section-header">
+                        <div>
+                            <div class="section-title">
+                                <span>${state.selectedCategory}</span>
+                                <span class="count-badge">${categoryProducts.length.toLocaleString('en-IN')} SKUs</span>
+                            </div>
+                            <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.25rem;">
+                                Showing curated items for ${state.selectedCategory}.
+                            </p>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="filterByCategory('All')">
+                            <i class="fa-solid fa-arrow-left"></i> View All Categories
+                        </button>
+                    </div>
+                    <div class="products-grid">
+                        ${categoryProducts.slice(0, 24).map(p => renderProductCardHTML(p)).join('')}
+                    </div>
+                `;
+            }
+
+            // Otherwise, render full multi-category Amazon/Flipkart Homepage
+            const mobiles = state.products.filter(p => p.category === 'Mobiles & Tablets').slice(0, 4);
+            const fashion = state.products.filter(p => p.category.includes('Fashion')).slice(0, 4);
+            const appliances = state.products.filter(p => p.category === 'Home & Kitchen').slice(0, 4);
+            const groceries = state.products.filter(p => p.category === 'Groceries & FMCG').slice(0, 4);
+            const laptopsAudio = state.products.filter(p => p.category === 'Laptops & Computers' || p.category === 'Audio & Wearables').slice(0, 4);
+            const lightningDeals = [mobiles[0], fashion[0], appliances[0], groceries[0]].filter(Boolean);
 
             return `
                 <!-- Next-Gen Vision Header Banner -->
@@ -1613,8 +1964,8 @@
                             <button class="btn bookings-nav-btn btn-lg" onclick="navigateTo('bookings')">
                                 <i class="fa-solid fa-plane-departure"></i> Unified Travel & Movie Bookings
                             </button>
-                            <button class="btn btn-outline-white btn-lg" onclick="openGstModal()" style="border:1.5px solid white;color:white;">
-                                <i class="fa-solid fa-calculator"></i> 18% GST Engine
+                            <button class="btn btn-lg" onclick="openGstModal()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#0f172a;font-weight:800;border:2px solid #fde68a;box-shadow:0 6px 20px rgba(245,158,11,0.45);">
+                                <i class="fa-solid fa-calculator" style="color:#78350f;"></i> 18% GST Engine Console
                             </button>
                         </div>
                     </div>
@@ -1646,16 +1997,16 @@
                         <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.5;">Flights, trains, buses, and cinema seats with live interactive seat maps and instant PNR checkout.</p>
                     </div>
 
-                    <div class="glass-card" style="padding:1.5rem;" onclick="openGstModal()">
-                        <div style="width:42px;height:42px;border-radius:10px;background:#ecfdf5;color:#047857;display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:0.75rem;">
-                            <i class="fa-solid fa-receipt"></i>
+                    <div class="glass-card" style="padding:1.5rem;border:2px solid #fde68a;" onclick="openGstModal()">
+                        <div style="width:42px;height:42px;border-radius:10px;background:#fef3c7;color:#b45309;display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:0.75rem;">
+                            <i class="fa-solid fa-calculator"></i>
                         </div>
-                        <h3 style="font-size:1.05rem;font-weight:800;color:var(--secondary);margin-bottom:0.25rem;">4. Indian GST Engine (18%)</h3>
+                        <h3 style="font-size:1.05rem;font-weight:800;color:#92400e;margin-bottom:0.25rem;">4. Indian GST Engine (18%)</h3>
                         <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.5;">CGST 9% + SGST 9% itemized calculation with coupon deductions and official printable tax invoice.</p>
                     </div>
                 </div>
 
-                <!-- Categories Scroll -->
+                <!-- Top Category Navigation Bar -->
                 <div class="category-scroll-container">
                     ${categories.map(cat => `
                         <button class="category-pill-btn ${state.selectedCategory === cat ? 'active' : ''}" 
@@ -1665,25 +2016,107 @@
                     `).join('')}
                 </div>
 
-                <!-- Section Header -->
-                <div class="section-header">
-                    <div class="section-title">
-                        <span>Mass Catalog Highlights</span>
-                        <span class="count-badge">${featuredProducts.length} items</span>
+                <!-- ⚡ LIGHTNING DEALS OF THE DAY STRIP -->
+                <div class="deals-strip">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem;">
+                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                            <h3 style="font-size:1.25rem;font-weight:800;color:#9a3412;">
+                                ⚡ Lightning Deals of the Day (Up to 70% Off)
+                            </h3>
+                            <span class="deals-countdown"><i class="fa-regular fa-clock"></i> Ends in 04h : 28m : 15s</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline" onclick="navigateTo('products')">
+                            Explore All Deals <i class="fa-solid fa-arrow-right"></i>
+                        </button>
                     </div>
-                    <button class="btn btn-outline btn-sm" onclick="navigateTo('products')">
-                        View All 20,000+ Catalog SKUs <i class="fa-solid fa-arrow-right"></i>
-                    </button>
+                    <div class="products-grid">
+                        ${lightningDeals.map(p => renderProductCardHTML(p)).join('')}
+                    </div>
                 </div>
 
-                <!-- Products Grid -->
-                <div class="products-grid">
-                    ${featuredProducts.map(p => renderProductCardHTML(p)).join('')}
+                <!-- SHELF 1: 📱 SMARTPHONES & MOBILE TECH -->
+                <div class="shelf-container">
+                    <div class="shelf-header">
+                        <div class="shelf-title">
+                            <i class="fa-solid fa-mobile-screen-button text-primary"></i>
+                            <span>Smartphones & Mobile Tech</span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="filterByCategory('Mobiles & Tablets')">
+                            View All Mobiles (${state.products.filter(p => p.category === 'Mobiles & Tablets').length.toLocaleString('en-IN')}) <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="products-grid">
+                        ${mobiles.map(p => renderProductCardHTML(p)).join('')}
+                    </div>
+                </div>
+
+                <!-- SHELF 2: 👔 TRENDING FASHION & FITVERSE 3D WARDROBE -->
+                <div class="shelf-container">
+                    <div class="shelf-header">
+                        <div class="shelf-title">
+                            <i class="fa-solid fa-shirt text-accent"></i>
+                            <span>Trending Fashion & FitVerse 3D Wardrobe</span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="navigateTo('fitverse')">
+                            Try in FitVerse 3D Studio <i class="fa-solid fa-person-rays"></i>
+                        </button>
+                    </div>
+                    <div class="products-grid">
+                        ${fashion.map(p => renderProductCardHTML(p)).join('')}
+                    </div>
+                </div>
+
+                <!-- SHELF 3: ❄️ MAJOR HOME APPLIANCES & SMART LIVING -->
+                <div class="shelf-container">
+                    <div class="shelf-header">
+                        <div class="shelf-title">
+                            <i class="fa-solid fa-kitchen-set text-success"></i>
+                            <span>Major Home Appliances & Energy Savings</span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="filterByCategory('Home & Kitchen')">
+                            View All Appliances (${state.products.filter(p => p.category === 'Home & Kitchen').length.toLocaleString('en-IN')}) <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="products-grid">
+                        ${appliances.map(p => renderProductCardHTML(p)).join('')}
+                    </div>
+                </div>
+
+                <!-- SHELF 4: 🛒 DAILY GROCERIES & FMCG ESSENTIALS -->
+                <div class="shelf-container">
+                    <div class="shelf-header">
+                        <div class="shelf-title">
+                            <i class="fa-solid fa-basket-shopping text-warning"></i>
+                            <span>Daily Groceries & FMCG (Subscribe & Save 10%)</span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="filterByCategory('Groceries & FMCG')">
+                            View All Groceries (${state.products.filter(p => p.category === 'Groceries & FMCG').length.toLocaleString('en-IN')}) <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="products-grid">
+                        ${groceries.map(p => renderProductCardHTML(p)).join('')}
+                    </div>
+                </div>
+
+                <!-- SHELF 5: 💻 LAPTOPS, AUDIO & WEARABLES -->
+                <div class="shelf-container">
+                    <div class="shelf-header">
+                        <div class="shelf-title">
+                            <i class="fa-solid fa-laptop text-info"></i>
+                            <span>Laptops, Computing & High-Fidelity Audio</span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="filterByCategory('Laptops & Computers')">
+                            View All Computing <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="products-grid">
+                        ${laptopsAudio.map(p => renderProductCardHTML(p)).join('')}
+                    </div>
                 </div>
             `;
         }
 
-        // PRODUCTS CATALOG PAGE
+        // PRODUCTS CATALOG PAGE WITH 20,480 SKU PAGINATION
         function renderProductsPage() {
             const categories = [
                 'All', 'Mobiles & Tablets', 'Laptops & Computers', 'Home & Kitchen',
@@ -1704,15 +2137,22 @@
             else if (state.sortBy === 'rating') filtered.sort((a, b) => b.rating - a.rating);
             else if (state.sortBy === 'benchmark') filtered.sort((a, b) => (b.antutuScore || 0) - (a.antutuScore || 0));
 
+            const totalItems = filtered.length;
+            const pageSize = state.pageSize || 24;
+            const totalPages = Math.ceil(totalItems / pageSize) || 1;
+            const currentPage = Math.min(Math.max(1, state.currentPage || 1), totalPages);
+            const startIdx = (currentPage - 1) * pageSize;
+            const pageItems = filtered.slice(startIdx, startIdx + pageSize);
+
             return `
                 <div class="section-header">
                     <div>
                         <div class="section-title">
                             <span>Massive Catalog Architecture</span>
-                            <span class="count-badge">20,480 SKUs</span>
+                            <span class="count-badge">${totalItems.toLocaleString('en-IN')} SKUs</span>
                         </div>
                         <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.25rem;">
-                            Taxonomic sorting across technical consumer verticals, groceries FMCG, and apparel.
+                            Taxonomic sorting across 20,480 SKUs: Consumer Electronics, FMCG Groceries, and Apparel with real-time stock sync.
                         </p>
                     </div>
 
@@ -1737,11 +2177,60 @@
                     `).join('')}
                 </div>
 
-                <!-- Product Listing -->
+                <div style="display:flex;justify-content:space-between;align-items:center;margin:1rem 0;font-size:0.85rem;color:var(--text-muted);">
+                    <span>Showing <strong>${startIdx + 1}–${Math.min(startIdx + pageSize, totalItems)}</strong> of <strong>${totalItems.toLocaleString('en-IN')}</strong> products (${state.selectedCategory})</span>
+                    <span>Page <strong>${currentPage}</strong> of <strong>${totalPages}</strong></span>
+                </div>
+
+                <!-- Product Listing Grid -->
                 <div class="products-grid">
-                    ${filtered.map(p => renderProductCardHTML(p)).join('')}
+                    ${pageItems.map(p => renderProductCardHTML(p)).join('')}
+                </div>
+
+                <!-- Pagination Bar -->
+                ${renderPaginationControls(currentPage, totalPages)}
+            `;
+        }
+
+        function renderPaginationControls(currentPage, totalPages) {
+            if (totalPages <= 1) return '';
+            let pages = [];
+            const delta = 2;
+            const left = Math.max(1, currentPage - delta);
+            const right = Math.min(totalPages, currentPage + delta);
+
+            for (let p = left; p <= right; p++) {
+                pages.push(p);
+            }
+
+            return `
+                <div class="pagination-bar">
+                    <button class="page-btn" onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''} title="First Page">
+                        <i class="fa-solid fa-angles-left"></i>
+                    </button>
+                    <button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} title="Previous Page">
+                        <i class="fa-solid fa-chevron-left"></i> Prev
+                    </button>
+                    ${left > 1 ? '<span style="padding:0 0.4rem;color:#94a3b8;">...</span>' : ''}
+                    ${pages.map(p => `
+                        <button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="changePage(${p})">
+                            ${p}
+                        </button>
+                    `).join('')}
+                    ${right < totalPages ? '<span style="padding:0 0.4rem;color:#94a3b8;">...</span>' : ''}
+                    <button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} title="Next Page">
+                        Next <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="page-btn" onclick="changePage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} title="Last Page">
+                        <i class="fa-solid fa-angles-right"></i>
+                    </button>
                 </div>
             `;
+        }
+
+        function changePage(page) {
+            dispatch({ type: ActionTypes.SET_PAGE, payload: { page } });
+            window.scrollTo({ top: 200, behavior: 'smooth' });
         }
 
         // ============================================================
@@ -1753,13 +2242,26 @@
             heightCm: 182,
             weightKg: 76,
             fitPref: 'Regular',
-            selectedGarmentId: 'men-001',
+            selectedGarmentId: 'men-003', // Allen Solly Pure Cotton Polo
+            garmentFilter: 'all',
             selectedColor: '#1e293b',
             selectedTexture: 'Cotton Pima',
             selectedSize: 'L',
-            viewMode: 'front', // 'front' | 'back'
+            viewMode: 'front',
             showHeatmap: true
         };
+
+        function selectFitverseGarment(garmentId) {
+            fitverseState.selectedGarmentId = garmentId;
+            renderApp();
+            showToast('Loaded garment for 3D Biometric Calibration', 'info');
+        }
+
+        function filterFitverseGarments(category) {
+            fitverseState.garmentFilter = category;
+            renderApp();
+        }
+
 
         function renderFitVersePage() {
             // Find current apparel item
@@ -3238,6 +3740,7 @@
         }
 
         function filterByCategory(category) {
+            dispatch({ type: ActionTypes.SET_PAGE, payload: { page: 1 } });
             dispatch({ type: ActionTypes.SET_CATEGORY, payload: { category } });
             if (state.currentRoute !== 'products' && state.currentRoute !== 'home') navigateTo('products');
         }
