@@ -1392,7 +1392,7 @@
                 </div>
                 <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.88rem;">
                     <span style="color:var(--text-muted);">Paid By:</span>
-                    <strong id="successPaymentMethod">UPI Instant (Swapnaneel Naskar)</strong>
+                    <strong id="successPaymentMethod">Merchant UPI (bharatcart@icici)</strong>
                 </div>
                 <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.88rem;">
                     <span style="color:var(--text-muted);">Delivery Address:</span>
@@ -2037,7 +2037,7 @@
                             </div>
                             <ul style="font-size:0.78rem;color:#15803d;padding-left:1.2rem;line-height:1.5;">
                                 <li>10% Instant Discount on HDFC & ICICI Credit Cards</li>
-                                <li>Flat ₹500 Cashback on UPI Transactions for Swapnaneel Naskar</li>
+                                <li>Flat ₹500 Cashback on UPI Transactions via BharatCart Gateway</li>
                                 <li>No-Cost EMI from ₹${Math.round(product.price / 6)}/month on BharatCart PayLater</li>
                             </ul>
                         </div>
@@ -3495,34 +3495,34 @@
                 content.innerHTML = `
                     <div style="text-align:center;">
                         <h4 style="font-size:1.1rem;font-weight:800;color:var(--secondary);margin-bottom:0.4rem;">
-                            Scan QR with Any UPI App
+                            Scan Official Merchant QR Code
                         </h4>
                         <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.25rem;">
-                            Google Pay, PhonePe, Paytm, BHIM, or any banking UPI app
+                            Merchant: <strong>BharatCart Retail Private Limited</strong> • UPI ID: <code style="color:var(--primary);font-weight:700;">bharatcart@icici</code>
                         </p>
 
                         <!-- High-Tech Dynamic QR Code -->
                         <div style="background:white;border:2px solid var(--border);border-radius:var(--radius-md);padding:1.25rem;display:inline-block;box-shadow:var(--shadow-md);margin-bottom:1.25rem;">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=bharatcart@icici&pn=BharatCart&am=${calc.grandTotal}&cu=INR" 
-                                 style="width:180px;height:180px;display:block;" alt="UPI QR Code" />
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=bharatcart@icici&pn=BharatCart+Retail+Private+Limited&am=${calc.grandTotal}&cu=INR" 
+                                 style="width:180px;height:180px;display:block;" alt="Merchant UPI QR Code" />
                             <div style="font-size:0.75rem;font-weight:700;color:var(--primary);margin-top:0.5rem;">
-                                <i class="fa-solid fa-clock"></i> Expires in 04:59
+                                <i class="fa-solid fa-clock"></i> Merchant QR Expires in 04:59
                             </div>
                         </div>
 
                         <!-- UPI ID Input -->
                         <div style="max-width:380px;margin:0 auto 1.5rem;text-align:left;">
-                            <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Or Enter UPI ID / VPA</label>
+                            <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Or Pay with Your UPI ID / VPA</label>
                             <div style="display:flex;gap:0.5rem;">
-                                <input type="text" id="upiIdInput" class="form-control" value="swapnaneel@oksbi" style="flex:1;padding:0.6rem;border-radius:var(--radius-sm);border:1px solid var(--border);font-family:'JetBrains Mono';" />
-                                <button class="btn btn-primary btn-sm" onclick="executeSmoothPayment('UPI (swapnaneel@oksbi)')">
+                                <input type="text" id="upiIdInput" class="form-control" placeholder="e.g. yourname@okhdfcbank or 9876543210@paytm" value="customer.pay@upi" style="flex:1;padding:0.6rem;border-radius:var(--radius-sm);border:1px solid var(--border);font-family:'JetBrains Mono';" />
+                                <button class="btn btn-primary btn-sm" onclick="handleUpiVpaPay()">
                                     Verify & Pay
                                 </button>
                             </div>
                         </div>
 
-                        <button class="btn btn-fk-buy btn-lg btn-block" onclick="executeSmoothPayment('UPI Instant Pay (QR Verified)')">
-                            <i class="fa-solid fa-bolt"></i> Complete UPI Payment (${formatINR(calc.grandTotal)})
+                        <button class="btn btn-fk-buy btn-lg btn-block" onclick="executeSmoothPayment('Merchant UPI (bharatcart@icici)')">
+                            <i class="fa-solid fa-bolt"></i> Complete Merchant UPI Payment (${formatINR(calc.grandTotal)})
                         </button>
                     </div>
                 `;
@@ -3620,7 +3620,7 @@
                         <i class="fa-solid fa-hand-holding-dollar text-warning" style="font-size:3rem;margin-bottom:0.75rem;"></i>
                         <h4 style="font-size:1.15rem;font-weight:800;color:var(--secondary);margin-bottom:0.35rem;">Cash or UPI on Delivery</h4>
                         <p style="font-size:0.85rem;color:var(--text-muted);max-width:380px;margin:0 auto 1.5rem;">
-                            Pay securely at your doorstep via Cash or instant UPI QR scan to the delivery executive at Swapnaneel Naskar's address.
+                            Pay securely at your doorstep via Cash or instant UPI QR scan to the delivery executive.
                         </p>
 
                         <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem;max-width:320px;margin:0 auto 1.5rem;font-size:0.85rem;">
@@ -3634,6 +3634,12 @@
                     </div>
                 `;
             }
+        }
+
+        function handleUpiVpaPay() {
+            const input = document.getElementById('upiIdInput');
+            const vpa = (input && input.value.trim()) ? input.value.trim() : 'customer.pay@upi';
+            executeSmoothPayment(`UPI VPA (${vpa})`);
         }
 
         // ============================================================
