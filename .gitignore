@@ -1,3 +1,5 @@
 *.backup
+*.prev_backup
 .DS_Store
 Thumbs.db
+
