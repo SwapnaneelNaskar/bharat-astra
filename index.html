@@ -1312,12 +1312,40 @@
             align-items: center;
             gap: 0.3rem;
         }
-        .write-review-card {
-            background: #f8fafc;
-            border: 1px solid var(--border);
+        /* AUTHENTICATION & LOGIN SEGMENT STYLES */
+        .auth-tab-strip {
+            display: flex;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+            gap: 4px;
+        }
+        .auth-tab-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            background: transparent;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .auth-tab-btn.active {
+            background: white;
+            color: var(--secondary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .owner-vip-card {
+            background: linear-gradient(135deg, #1e1b4b, #0f172a);
+            border: 1.5px solid #f59e0b;
             border-radius: var(--radius-md);
             padding: 1.25rem;
-            margin-top: 1.25rem;
+            color: white;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.2);
         }
 
         @media (max-width: 900px) {
@@ -1725,6 +1753,20 @@
             PLACE_ORDER: 'PLACE_ORDER'
         };
 
+        // User Accounts Registry for custom credentials
+        let authUsersRegistry = {
+            'cristiano7@gmail.com': {
+                name: 'Swapnaneel Naskar',
+                email: 'cristiano7@gmail.com',
+                password: 'ronaldo7',
+                phone: '+91 98765 43210',
+                address: 'Flat 402, Royal Residency, Outer Ring Road, Bengaluru, Karnataka - 560103',
+                walletBalance: 70000000, // ₹7 Crore (₹7,00,00,000)
+                isOwner: true,
+                isVip: true
+            }
+        };
+
         let state = {
             products: BASE_PRODUCTS,
             cart: [],
@@ -1740,10 +1782,12 @@
             gstRate: 0.18,
             currentUser: {
                 name: 'Swapnaneel Naskar',
-                email: 'swapnaneelnaskar2903@gmail.com',
+                email: 'cristiano7@gmail.com',
+                password: 'ronaldo7',
                 phone: '+91 98765 43210',
                 address: 'Flat 402, Royal Residency, Outer Ring Road, Bengaluru, Karnataka - 560103',
                 walletBalance: 70000000, // ₹7 Crore (₹7,00,00,000)
+                isOwner: true,
                 isVip: true,
                 isLoggedIn: true
             }
@@ -1763,7 +1807,6 @@
                             quantity: newCart[existingIndex].quantity + quantity
                         };
                     } else {
-                        // Apply variant price adjustment if storage selected
                         let adjustedProduct = { ...product };
                         if (options.priceDelta) {
                             adjustedProduct.price = Math.max(199, adjustedProduct.price + options.priceDelta);
@@ -1830,12 +1873,8 @@
                     return { ...currentState, currentRoute: action.payload };
 
                 case ActionTypes.ADD_COMPARE: {
-                    if (currentState.compareList.length >= 3) {
-                        return currentState;
-                    }
-                    if (currentState.compareList.find(p => p.id === action.payload.id)) {
-                        return currentState;
-                    }
+                    if (currentState.compareList.length >= 3) return currentState;
+                    if (currentState.compareList.find(p => p.id === action.payload.id)) return currentState;
                     return { ...currentState, compareList: [...currentState.compareList, action.payload] };
                 }
 
@@ -1881,30 +1920,42 @@
         }
 
         function updateHeaderBadges() {
-            const badge = document.getElementById('cartBadge');
-            if (badge) {
-                const count = state.cart.reduce((acc, item) => acc + item.quantity, 0);
-                badge.innerText = count;
-                badge.style.display = count > 0 ? 'inline-flex' : 'none';
-            }
-            const compareBadge = document.getElementById('compareBadge');
-            if (compareBadge) {
-                compareBadge.innerText = state.compareList.length;
-                compareBadge.style.display = state.compareList.length > 0 ? 'inline-flex' : 'none';
-            }
-            const walletEl = document.getElementById('navWalletAmount');
-            const walletBadge = document.getElementById('navWalletBadge');
-            if (walletEl && walletBadge) {
-                if (state.currentUser && state.currentUser.isLoggedIn && state.currentUser.isVip) {
-                    walletEl.innerText = formatWalletDisplay(state.currentUser.walletBalance);
-                    walletBadge.style.display = 'inline-flex';
-                } else {
-                    walletBadge.style.display = 'none';
+            const cartCount = state.cart.reduce((acc, item) => acc + item.quantity, 0);
+            ['navCartCount', 'cartBadge'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerText = cartCount;
+                    el.style.display = cartCount > 0 ? 'inline-flex' : 'none';
                 }
+            });
+
+            const compCount = state.compareList.length;
+            ['navCompareCount', 'compareBadge'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerText = `(${compCount})`;
+                    el.style.display = compCount > 0 ? 'inline' : 'none';
+                }
+            });
+
+            const isOwner = (state.currentUser && state.currentUser.isLoggedIn && state.currentUser.isOwner && state.currentUser.email === 'cristiano7@gmail.com');
+            const walletBadge = document.getElementById('navWalletBadge');
+            if (walletBadge) {
+                walletBadge.style.display = isOwner ? 'inline-flex' : 'none';
             }
-            const userEl = document.getElementById('navUserName');
-            if (userEl) {
-                userEl.innerText = (state.currentUser && state.currentUser.isLoggedIn) ? state.currentUser.name.split(' ')[0] : 'Sign In';
+
+            const walletDisplay = document.getElementById('navWalletDisplay') || document.getElementById('navWalletAmount');
+            if (walletDisplay && isOwner) {
+                walletDisplay.innerText = formatWalletDisplay(state.currentUser.walletBalance);
+            }
+
+            const userDisplay = document.getElementById('navUserNameDisplay') || document.getElementById('navUserName');
+            if (userDisplay) {
+                if (state.currentUser && state.currentUser.isLoggedIn) {
+                    userDisplay.innerText = isOwner ? 'Swapnaneel (Owner)' : state.currentUser.name.split(' ')[0];
+                } else {
+                    userDisplay.innerText = 'Sign In';
+                }
             }
         }
 
@@ -1984,10 +2035,10 @@
             }
 
             const taxableSubtotal = Math.max(0, subtotal - discountAmount);
-            const halfGstRate = gstRate / 2; // 9% CGST + 9% SGST
+            const halfGstRate = gstRate / 2;
             const cgstAmount = Math.round(taxableSubtotal * halfGstRate);
             const sgstAmount = Math.round(taxableSubtotal * halfGstRate);
-            const totalGst = cgstAmount + sgstAmount; // 18% total
+            const totalGst = cgstAmount + sgstAmount;
 
             const deliveryFee = (subtotal === 0 || subtotal >= 500) ? 0 : 50;
             const grandTotal = taxableSubtotal + totalGst + deliveryFee;
@@ -2115,96 +2166,254 @@
         }
 
         // ============================================================
-        // 5. AUTHENTICATION & IDENTITY SYSTEM
+        // 5. AUTHENTICATION & LOGIN SYSTEM (OWNER & CUSTOMERS)
         // ============================================================
+        let activeAuthTab = 'login'; // 'login' | 'register' | 'profile'
+
         function openAuthModal() {
-            const body = document.getElementById('authModalBody');
-            if (!body) return;
-
-            const isSwapnaneel = (state.currentUser && state.currentUser.isLoggedIn && state.currentUser.isVip);
-
-            body.innerHTML = `
-                <div style="text-align:center;margin-bottom:1.5rem;">
-                    <div style="width:68px;height:68px;background:${isSwapnaneel ? 'linear-gradient(135deg, #f59e0b, #d97706)' : '#e2e8f0'};border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;font-size:1.8rem;color:${isSwapnaneel ? 'white' : '#64748b'};box-shadow:${isSwapnaneel ? '0 0 20px rgba(245,158,11,0.4)' : 'none'};">
-                        <i class="fa-solid ${isSwapnaneel ? 'fa-crown' : 'fa-user'}"></i>
-                    </div>
-                    <h3 style="font-size:1.35rem;font-weight:800;color:var(--secondary);margin:0;">
-                        ${state.currentUser.isLoggedIn ? state.currentUser.name : 'Guest User'}
-                    </h3>
-                    <p style="font-size:0.85rem;color:var(--text-muted);margin:0.25rem 0 0;">
-                        ${state.currentUser.isLoggedIn ? state.currentUser.email : 'Not signed in'}
-                    </p>
-                </div>
-
-                ${isSwapnaneel ? `
-                    <!-- VIP Treasury Allocation Card -->
-                    <div style="background:linear-gradient(135deg, #1e1b4b, #0f172a);border:1.5px solid #f59e0b;border-radius:var(--radius-md);padding:1.25rem;color:white;margin-bottom:1.5rem;box-shadow:0 8px 24px rgba(245,158,11,0.15);">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-                            <span style="font-size:0.75rem;text-transform:uppercase;color:#fde047;font-weight:800;letter-spacing:1px;">
-                                <i class="fa-solid fa-crown"></i> Exclusive VIP Treasury Line
-                            </span>
-                            <span style="background:#10b981;color:white;font-size:0.7rem;font-weight:800;padding:0.15rem 0.5rem;border-radius:999px;">
-                                ACTIVE ALLOCATION
-                            </span>
-                        </div>
-                        <div style="font-size:2rem;font-weight:800;color:#fde047;font-family:'JetBrains Mono';margin-bottom:0.35rem;">
-                            ${formatINR(state.currentUser.walletBalance)}
-                        </div>
-                        <p style="font-size:0.8rem;opacity:0.85;line-height:1.4;margin:0;">
-                            This demo account is allocated <strong>₹7.00 Crore</strong> in BharatCart Treasury for seamless testing of high-value luxury orders, flight bookings, and fine jewelry.
-                        </p>
-                    </div>
-
-                    <div style="display:flex;flex-direction:column;gap:0.75rem;">
-                        <button class="btn btn-outline btn-block text-danger" onclick="logoutUser()" style="border-color:#ef4444;">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Switch to Guest / Standard Account (₹0 Balance)
-                        </button>
-                    </div>
-                ` : `
-                    <!-- One-Tap VIP Login Option -->
-                    <div style="background:#fef3c7;border:1.5px solid #f59e0b;border-radius:var(--radius-md);padding:1.25rem;margin-bottom:1.5rem;">
-                        <div style="font-size:0.82rem;font-weight:800;color:#92400e;margin-bottom:0.35rem;">
-                            <i class="fa-solid fa-crown text-warning"></i> Instant VIP Customer Login
-                        </div>
-                        <p style="font-size:0.82rem;color:#78350f;margin-bottom:0.75rem;line-height:1.4;">
-                            Log in as <strong>Swapnaneel Naskar</strong> with the pre-loaded <strong>₹7 Crore VIP Treasury Wallet</strong>.
-                        </p>
-                        <button class="btn-gst-amber btn-block" onclick="loginAsSwapnaneelVIP()">
-                            <i class="fa-solid fa-bolt"></i> Log In as Swapnaneel Naskar (₹7 Cr VIP)
-                        </button>
-                    </div>
-
-                    <!-- Custom Credentials Form -->
-                    <form onsubmit="handleCustomAuthSubmit(event)">
-                        <div style="margin-bottom:0.75rem;">
-                            <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Full Name</label>
-                            <input type="text" id="authCustomName" class="form-control" placeholder="Enter your full name" required style="width:100%;padding:0.6rem;border-radius:6px;border:1px solid var(--border);" />
-                        </div>
-                        <div style="margin-bottom:1rem;">
-                            <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Email Address</label>
-                            <input type="email" id="authCustomEmail" class="form-control" placeholder="name@example.com" required style="width:100%;padding:0.6rem;border-radius:6px;border:1px solid var(--border);" />
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">
-                            Sign In to Standard Account (₹0 Balance)
-                        </button>
-                    </form>
-                `}
-            `;
-
+            activeAuthTab = (state.currentUser && state.currentUser.isLoggedIn) ? 'profile' : 'login';
+            renderAuthModalContent();
             document.getElementById('authModal').classList.add('open');
         }
 
-        function loginAsSwapnaneelVIP() {
-            state.currentUser = {
-                name: 'Swapnaneel Naskar',
-                email: 'swapnaneelnaskar2903@gmail.com',
-                phone: '+91 98765 43210',
-                address: 'Flat 402, Royal Residency, Outer Ring Road, Bengaluru, Karnataka - 560103',
-                walletBalance: 70000000,
-                isVip: true,
+        function switchAuthTab(tab) {
+            activeAuthTab = tab;
+            renderAuthModalContent();
+        }
+
+        function renderAuthModalContent() {
+            const body = document.getElementById('authModalBody');
+            if (!body) return;
+
+            const isOwner = (state.currentUser && state.currentUser.isLoggedIn && state.currentUser.isOwner && state.currentUser.email === 'cristiano7@gmail.com');
+            const isLoggedIn = (state.currentUser && state.currentUser.isLoggedIn);
+
+            body.innerHTML = `
+                <!-- Auth Tabs Strip -->
+                <div class="auth-tab-strip">
+                    <button class="auth-tab-btn ${activeAuthTab === 'login' ? 'active' : ''}" onclick="switchAuthTab('login')">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+                    </button>
+                    <button class="auth-tab-btn ${activeAuthTab === 'register' ? 'active' : ''}" onclick="switchAuthTab('register')">
+                        <i class="fa-solid fa-user-plus"></i> Register
+                    </button>
+                    ${isLoggedIn ? `
+                        <button class="auth-tab-btn ${activeAuthTab === 'profile' ? 'active' : ''}" onclick="switchAuthTab('profile')">
+                            <i class="fa-solid fa-user-gear"></i> My Account
+                        </button>
+                    ` : ''}
+                </div>
+
+                ${activeAuthTab === 'login' ? `
+                    <!-- LOGIN FORM -->
+                    <div>
+                        <!-- OWNER VIP HIGHLIGHT BOX -->
+                        <div class="owner-vip-card">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+                                <span style="font-size:0.75rem;text-transform:uppercase;color:#fde047;font-weight:800;letter-spacing:1px;">
+                                    <i class="fa-solid fa-crown text-warning"></i> Owner VIP Access
+                                </span>
+                                <span style="background:#10b981;color:white;font-size:0.7rem;font-weight:800;padding:0.15rem 0.5rem;border-radius:999px;">
+                                    ₹7 CRORE TREASURY
+                                </span>
+                            </div>
+                            <p style="font-size:0.8rem;opacity:0.9;line-height:1.4;margin-bottom:0.75rem;">
+                                Owner Email: <code style="color:#fde047;font-weight:700;">cristiano7@gmail.com</code> | Password: <code style="color:#fde047;font-weight:700;">ronaldo7</code>
+                            </p>
+                            <button type="button" class="btn-gst-amber btn-sm btn-block" onclick="fillOwnerCredentials()">
+                                <i class="fa-solid fa-bolt"></i> Autofill & Log In as Owner (₹7 Cr VIP)
+                            </button>
+                        </div>
+
+                        <!-- LOGIN INPUTS -->
+                        <form onsubmit="handleLoginSubmit(event)">
+                            <div style="margin-bottom:0.75rem;">
+                                <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Email Address</label>
+                                <input type="email" id="authLoginEmail" placeholder="Enter your email" required class="form-control" style="width:100%;padding:0.6rem;border-radius:6px;border:1px solid var(--border);" />
+                            </div>
+                            <div style="margin-bottom:1.25rem;">
+                                <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Password</label>
+                                <input type="password" id="authLoginPass" placeholder="Enter password" required class="form-control" style="width:100%;padding:0.6rem;border-radius:6px;border:1px solid var(--border);" />
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg btn-block">
+                                <i class="fa-solid fa-lock"></i> Secure Sign In
+                            </button>
+                        </form>
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.75rem;text-align:center;">
+                            New users will be registered with a Standard Account (₹0 Balance).
+                        </p>
+                    </div>
+                ` : ''}
+
+                ${activeAuthTab === 'register' ? `
+                    <!-- REGISTRATION FORM -->
+                    <div>
+                        <h4 style="font-size:1.05rem;font-weight:800;color:var(--secondary);margin-bottom:0.35rem;">Create Standard Customer Account</h4>
+                        <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.4;">
+                            Register with your own email and password. Standard accounts are created with ₹0 balance. Only the verified Owner (<code>cristiano7@gmail.com</code>) has access to the ₹7 Cr Treasury.
+                        </p>
+                        <form onsubmit="handleRegisterSubmit(event)">
+                            <div style="margin-bottom:0.75rem;">
+                                <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.2rem;">Full Name</label>
+                                <input type="text" id="regName" placeholder="Your full name" required class="form-control" style="width:100%;padding:0.5rem;border-radius:6px;border:1px solid var(--border);" />
+                            </div>
+                            <div style="margin-bottom:0.75rem;">
+                                <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.2rem;">Email Address</label>
+                                <input type="email" id="regEmail" placeholder="yourname@gmail.com" required class="form-control" style="width:100%;padding:0.5rem;border-radius:6px;border:1px solid var(--border);" />
+                            </div>
+                            <div style="margin-bottom:0.75rem;">
+                                <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.2rem;">Password</label>
+                                <input type="password" id="regPass" placeholder="Choose a password" required class="form-control" style="width:100%;padding:0.5rem;border-radius:6px;border:1px solid var(--border);" />
+                            </div>
+                            <div style="margin-bottom:1rem;">
+                                <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.2rem;">City / Delivery Address</label>
+                                <input type="text" id="regAddress" placeholder="e.g. Mumbai, Maharashtra" required class="form-control" style="width:100%;padding:0.5rem;border-radius:6px;border:1px solid var(--border);" />
+                            </div>
+                            <button type="submit" class="btn btn-fk-buy btn-lg btn-block">
+                                <i class="fa-solid fa-user-plus"></i> Register Standard Account (₹0 Balance)
+                            </button>
+                        </form>
+                    </div>
+                ` : ''}
+
+                ${activeAuthTab === 'profile' ? `
+                    <!-- ACCOUNT PROFILE / STATUS -->
+                    <div style="text-align:center;">
+                        <div style="width:68px;height:68px;background:${isOwner ? 'linear-gradient(135deg, #f59e0b, #d97706)' : '#e2e8f0'};border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;font-size:1.8rem;color:${isOwner ? 'white' : '#64748b'};box-shadow:${isOwner ? '0 0 20px rgba(245,158,11,0.4)' : 'none'};">
+                            <i class="fa-solid ${isOwner ? 'fa-crown' : 'fa-user'}"></i>
+                        </div>
+                        <h3 style="font-size:1.35rem;font-weight:800;color:var(--secondary);margin:0;">
+                            ${state.currentUser.name}
+                        </h3>
+                        <p style="font-size:0.85rem;color:var(--text-muted);margin:0.25rem 0 1rem;">
+                            ${state.currentUser.email}
+                        </p>
+
+                        ${isOwner ? `
+                            <div style="background:linear-gradient(135deg, #1e1b4b, #0f172a);border:1.5px solid #f59e0b;border-radius:var(--radius-md);padding:1.25rem;color:white;margin-bottom:1.5rem;">
+                                <span style="font-size:0.72rem;text-transform:uppercase;color:#fde047;font-weight:800;letter-spacing:1px;display:block;margin-bottom:0.25rem;">
+                                    <i class="fa-solid fa-crown"></i> Exclusive Owner VIP Treasury
+                                </span>
+                                <div style="font-size:2rem;font-weight:800;color:#fde047;font-family:'JetBrains Mono';margin-bottom:0.35rem;">
+                                    ${formatINR(state.currentUser.walletBalance)}
+                                </div>
+                                <p style="font-size:0.78rem;opacity:0.85;margin:0;">
+                                    Only account <code>cristiano7@gmail.com</code> has authorization to deploy this ₹7 Crore treasury allocation.
+                                </p>
+                            </div>
+                        ` : `
+                            <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.5rem;">
+                                <span style="font-size:0.75rem;text-transform:uppercase;color:var(--text-muted);font-weight:700;display:block;">Standard Customer Wallet:</span>
+                                <strong style="font-size:1.4rem;color:var(--secondary);">${formatINR(state.currentUser.walletBalance || 0)}</strong>
+                                <p style="font-size:0.75rem;color:var(--text-muted);margin:0.25rem 0 0;">
+                                    Standard customer account. Pay via UPI, Cards, Net Banking, EMI, or COD.
+                                </p>
+                            </div>
+                        `}
+
+                        <button class="btn btn-outline btn-block text-danger" onclick="logoutUser()" style="border-color:#ef4444;">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+                        </button>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function fillOwnerCredentials() {
+            const emailInput = document.getElementById('authLoginEmail');
+            const passInput = document.getElementById('authLoginPass');
+            if (emailInput) emailInput.value = 'cristiano7@gmail.com';
+            if (passInput) passInput.value = 'ronaldo7';
+            handleLoginSubmit();
+        }
+
+        function handleLoginSubmit(e) {
+            if (e) e.preventDefault();
+            const emailInput = document.getElementById('authLoginEmail');
+            const passInput = document.getElementById('authLoginPass');
+            const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+            const password = passInput ? passInput.value.trim() : '';
+
+            if (email === 'cristiano7@gmail.com' && password === 'ronaldo7') {
+                // OWNER VIP LOGIN
+                state.currentUser = {
+                    name: 'Swapnaneel Naskar',
+                    email: 'cristiano7@gmail.com',
+                    password: 'ronaldo7',
+                    phone: '+91 98765 43210',
+                    address: 'Flat 402, Royal Residency, Outer Ring Road, Bengaluru - 560103',
+                    walletBalance: 70000000, // ₹7 Crore (₹7,00,00,000)
+                    isOwner: true,
+                    isVip: true,
+                    isLoggedIn: true
+                };
+                showToast('👑 Welcome Owner Swapnaneel Naskar! ₹7 Cr VIP Treasury Activated.', 'success');
+            } else {
+                // OTHER USERS: Check registry or authenticate with standard account (₹0 balance)
+                const existing = authUsersRegistry[email];
+                if (existing) {
+                    if (existing.password && existing.password !== password) {
+                        showToast('Incorrect password for this email.', 'danger');
+                        return;
+                    }
+                    state.currentUser = { ...existing, isLoggedIn: true, walletBalance: 0, isOwner: false, isVip: false };
+                } else {
+                    const name = email.split('@')[0].toUpperCase();
+                    const newUser = {
+                        name: name,
+                        email: email,
+                        password: password,
+                        phone: '+91 91234 56789',
+                        address: 'India',
+                        walletBalance: 0,
+                        isOwner: false,
+                        isVip: false,
+                        isLoggedIn: true
+                    };
+                    authUsersRegistry[email] = newUser;
+                    state.currentUser = newUser;
+                }
+                showToast(`Logged in as ${state.currentUser.name} (Standard Account • ₹0 Balance)`, 'info');
+            }
+
+            updateHeaderBadges();
+            closeModal('authModal');
+            renderApp();
+        }
+
+        function handleRegisterSubmit(e) {
+            if (e) e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const password = document.getElementById('regPass').value.trim();
+            const address = document.getElementById('regAddress').value.trim();
+
+            if (!email || !password) return;
+
+            // If registering with owner email
+            if (email === 'cristiano7@gmail.com') {
+                showToast('This email is reserved for Owner VIP login.', 'warning');
+                switchAuthTab('login');
+                fillOwnerCredentials();
+                return;
+            }
+
+            const newUser = {
+                name: name || email.split('@')[0],
+                email: email,
+                password: password,
+                phone: '+91 91234 56789',
+                address: address || 'India',
+                walletBalance: 0, // Standard accounts have ₹0
+                isOwner: false,
+                isVip: false,
                 isLoggedIn: true
             };
-            showToast('👑 Logged in as Swapnaneel Naskar (₹7 Cr VIP Treasury)', 'success');
+
+            authUsersRegistry[email] = newUser;
+            state.currentUser = newUser;
+
+            showToast(`🎉 Account created for ${newUser.name}! Logged in (₹0 Balance).`, 'success');
             updateHeaderBadges();
             closeModal('authModal');
             renderApp();
@@ -2213,35 +2422,15 @@
         function logoutUser() {
             state.currentUser = {
                 name: 'Guest User',
-                email: 'guest@bharatcart.com',
+                email: '',
                 phone: '',
                 address: '',
                 walletBalance: 0,
+                isOwner: false,
                 isVip: false,
                 isLoggedIn: false
             };
-            showToast('Switched to Standard Guest Mode (₹0 Balance)', 'info');
-            updateHeaderBadges();
-            closeModal('authModal');
-            renderApp();
-        }
-
-        function handleCustomAuthSubmit(e) {
-            e.preventDefault();
-            const name = document.getElementById('authCustomName').value.trim();
-            const email = document.getElementById('authCustomEmail').value.trim();
-            if (!name) return;
-
-            state.currentUser = {
-                name: name,
-                email: email,
-                phone: '+91 91234 56789',
-                address: 'Bengaluru, India',
-                walletBalance: 0,
-                isVip: false,
-                isLoggedIn: true
-            };
-            showToast(`Welcome, ${name}! Standard Account created.`, 'success');
+            showToast('Logged out. Switched to Guest Mode.', 'info');
             updateHeaderBadges();
             closeModal('authModal');
             renderApp();
@@ -2287,7 +2476,7 @@
                     </div>
                 </div>
 
-                <!-- Shelf 1: Fine Jewelry & Luxury Ornaments (NEW) -->
+                <!-- Shelf 1: Fine Jewelry & Luxury Ornaments -->
                 <div class="shelf-section">
                     <div class="shelf-header">
                         <div class="shelf-title">
@@ -2416,7 +2605,6 @@
             const hasFitverse = p.category && (p.category.includes('Fashion') || p.category === 'Shoes & Footwear');
             const discountPct = Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100);
 
-            // Preview chips for storage / colors
             const isGadget = p.category && (p.category.includes('Mobile') || p.category.includes('Laptop') || p.category.includes('Electronics'));
             const isWearing = p.category && (p.category.includes('Fashion') || p.category === 'Shoes & Footwear' || p.category === 'Jewelry & Luxury Ornaments');
 
@@ -2433,7 +2621,6 @@
                             ${p.name}
                         </div>
 
-                        <!-- Mini Variant Preview -->
                         ${isGadget && p.storageOptions && p.storageOptions.length ? `
                             <div style="font-size:0.7rem;color:var(--text-muted);margin:0.2rem 0;display:flex;gap:0.3rem;align-items:center;">
                                 <i class="fa-solid fa-microchip" style="font-size:0.65rem;"></i>
@@ -2491,7 +2678,7 @@
                             ${state.categoryFilter === 'All' ? 'All Products' : state.categoryFilter}
                         </h2>
                         <p style="font-size:0.85rem;color:var(--text-muted);margin:0.25rem 0 0;">
-                            Showing ${totalItems.toLocaleString('en-IN')} available SKUs across India • Customer: Swapnaneel Naskar
+                            Showing ${totalItems.toLocaleString('en-IN')} available SKUs across India • User: ${state.currentUser.name}
                         </p>
                     </div>
 
@@ -2580,7 +2767,6 @@
             }
             if (!product) return;
 
-            // Initialize detail modal state
             detailModalState.product = product;
             detailModalState.selectedStorage = (product.storageOptions && product.storageOptions.length) ? product.storageOptions[0] : '';
             detailModalState.storagePriceDelta = 0;
@@ -2608,7 +2794,6 @@
             const originalPrice = product.originalPrice + detailModalState.storagePriceDelta;
             const discountPct = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
 
-            // Determine size options for wearing items
             let sizeOptions = product.sizeOptions || [];
             if (!sizeOptions.length && isWearing) {
                 if (product.category === 'Shoes & Footwear') {
@@ -2620,7 +2805,6 @@
                 }
             }
 
-            // Specs dictionary
             const specs = product.specs || {
                 'Brand': product.brand || 'BharatCart Verified',
                 'Model': product.name,
@@ -2746,7 +2930,7 @@
                             <ul style="font-size:0.78rem;color:#15803d;padding-left:1.2rem;line-height:1.5;">
                                 <li>10% Instant Discount on HDFC & ICICI Credit Cards</li>
                                 <li>Flat ₹500 Cashback on UPI Transactions via BharatCart Gateway</li>
-                                <li>VIP Treasury Wallet Accepted with ₹7 Cr Balance</li>
+                                <li>Owner VIP Treasury Wallet Accepted with ₹7 Cr Balance</li>
                             </ul>
                         </div>
 
@@ -2963,6 +3147,38 @@
             detailModalState.reviews.unshift(newRev);
             showToast('🎉 Review submitted successfully! Thank you for your feedback.', 'success');
             renderProductDetailModalContent();
+        }
+
+        // ============================================================
+        // 9. APP RENDER ROUTER (DEFINED GLOBALLY SO IT NEVER FAILS)
+        // ============================================================
+        function renderApp() {
+            const root = document.getElementById('appRoot');
+            if (!root) return;
+
+            // Update nav item active states
+            const routes = ['home', 'products', 'fitverse', 'bookings', 'cart', 'orders'];
+            routes.forEach(r => {
+                const btn = document.getElementById(`nav${r.charAt(0).toUpperCase() + r.slice(1)}Btn`);
+                if (btn) btn.classList.toggle('active', state.currentRoute === r);
+            });
+
+            // Route execution with safe existence checks
+            if (state.currentRoute === 'home') {
+                root.innerHTML = (typeof renderHomePage === 'function') ? renderHomePage() : '';
+            } else if (state.currentRoute === 'products') {
+                root.innerHTML = (typeof renderCatalogPage === 'function') ? renderCatalogPage() : '';
+            } else if (state.currentRoute === 'fitverse') {
+                root.innerHTML = (typeof renderFitVersePage === 'function') ? renderFitVersePage() : '<p style="padding:2rem;">Loading FitVerse Studio...</p>';
+            } else if (state.currentRoute === 'bookings') {
+                root.innerHTML = (typeof renderBookingsPage === 'function') ? renderBookingsPage() : '<p style="padding:2rem;">Loading Travel Logistics...</p>';
+            } else if (state.currentRoute === 'cart') {
+                root.innerHTML = (typeof renderCartPage === 'function') ? renderCartPage() : '<p style="padding:2rem;">Loading Cart...</p>';
+            } else if (state.currentRoute === 'orders') {
+                root.innerHTML = (typeof renderOrdersPage === 'function') ? renderOrdersPage() : '<p style="padding:2rem;">Loading Orders...</p>';
+            }
+
+            updateHeaderBadges();
         }
     
         // ============================================================
@@ -4597,7 +4813,7 @@
         }
     
         // ============================================================
-        // 10. UNIFIED CART VIEW & SUMMARY
+        // 12. UNIFIED CART VIEW & FINANCIAL SUMMARY
         // ============================================================
         function renderCartPage() {
             if (state.cart.length === 0) {
@@ -4606,7 +4822,7 @@
                         <div style="font-size:3.5rem;color:var(--primary);margin-bottom:1rem;"><i class="fa-solid fa-basket-shopping"></i></div>
                         <h3 style="font-size:1.6rem;font-weight:800;color:var(--secondary);">Your Unified BharatCart is Empty!</h3>
                         <p style="color:var(--text-muted);margin:0.5rem 0 1.5rem;line-height:1.5;">
-                            Explore 20,000+ catalog products, try coordinated outfits in FitVerse Studio, or book worldwide flights and Vande Bharat trains.
+                            Explore 20,000+ catalog products, fine gold jewelry, try outfits in FitVerse Studio, or book worldwide flights and Vande Bharat trains.
                         </p>
                         <button class="btn btn-primary btn-lg" onclick="navigateTo('products')">Start Shopping Now</button>
                     </div>
@@ -4622,7 +4838,7 @@
                             Unified Shopping Bag
                         </h2>
                         <p style="font-size:0.85rem;color:var(--text-muted);margin:0.25rem 0 0;">
-                            Holding ${calc.totalItemCount} items (Physical Products, Travel PNRs, Movie Passes & Hotel Suites) • Swapnaneel Naskar
+                            Holding ${calc.totalItemCount} item(s) (Physical Products, Travel PNRs, Movie Passes & Luxury Hotel Suites) • User: ${state.currentUser.name}
                         </p>
                     </div>
                     <button class="btn btn-subtle btn-sm text-danger" onclick="clearCartConfirm()">
@@ -4641,8 +4857,16 @@
                                 <div style="flex:1;">
                                     <div style="font-size:0.72rem;font-weight:700;color:var(--primary);text-transform:uppercase;">${item.product.category}</div>
                                     <h4 style="font-size:0.98rem;font-weight:700;color:var(--secondary);margin-bottom:0.25rem;">${item.product.name}</h4>
-                                    ${item.options && item.options.biometricFit ? `<div style="font-size:0.78rem;color:#7c3aed;"><i class="fa-solid fa-person-rays"></i> FitVerse: ${item.options.biometricFit}</div>` : ''}
-                                    ${item.options && item.options.pnr ? `<div style="font-size:0.78rem;color:#0284c7;"><i class="fa-solid fa-ticket"></i> PNR: <strong>${item.options.pnr}</strong> • Seats: ${item.options.seats}</div>` : ''}
+                                    
+                                    <!-- Customized Options Badges -->
+                                    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.2rem 0;">
+                                        ${item.options?.storage ? `<span style="font-size:0.72rem;background:#e0e7ff;color:var(--primary);padding:0.1rem 0.4rem;border-radius:4px;font-weight:700;"><i class="fa-solid fa-microchip"></i> ${item.options.storage}</span>` : ''}
+                                        ${item.options?.color ? `<span style="font-size:0.72rem;background:#f1f5f9;color:var(--secondary);padding:0.1rem 0.4rem;border-radius:4px;font-weight:700;"><i class="fa-solid fa-palette"></i> ${item.options.color}</span>` : ''}
+                                        ${item.options?.size ? `<span style="font-size:0.72rem;background:#fef3c7;color:#92400e;padding:0.1rem 0.4rem;border-radius:4px;font-weight:700;"><i class="fa-solid fa-ruler"></i> Size: ${item.options.size}</span>` : ''}
+                                        ${item.options?.biometricFit ? `<span style="font-size:0.72rem;background:#ede9fe;color:#6d28d9;padding:0.1rem 0.4rem;border-radius:4px;font-weight:700;"><i class="fa-solid fa-person-rays"></i> FitVerse: ${item.options.biometricFit}</span>` : ''}
+                                        ${item.options?.pnr ? `<span style="font-size:0.72rem;background:#e0f2fe;color:#0369a1;padding:0.1rem 0.4rem;border-radius:4px;font-weight:700;"><i class="fa-solid fa-ticket"></i> PNR: ${item.options.pnr}</span>` : ''}
+                                    </div>
+
                                     <div style="font-size:0.85rem;color:var(--text-muted);margin-top:2px;">Unit Price: <strong>${formatINR(item.product.price)}</strong></div>
 
                                     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.5rem;">
@@ -4673,8 +4897,8 @@
                                 <button class="btn btn-primary btn-sm" onclick="handleApplyCoupon()">Apply</button>
                             </div>
                             <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;">
-                                <span class="code-pill" style="color:#7e22ce;background:rgba(126,34,206,0.1);" onclick="applyCouponDirectly('FESTIVE20')">FESTIVE20 (20%)</span>
-                                <span class="code-pill" style="color:#7e22ce;background:rgba(126,34,206,0.1);" onclick="applyCouponDirectly('WELCOME10')">WELCOME10 (10%)</span>
+                                <span class="code-pill" style="color:#7e22ce;background:rgba(126,34,206,0.1);padding:0.15rem 0.45rem;border-radius:4px;cursor:pointer;font-size:0.75rem;font-weight:700;" onclick="applyCouponDirectly('FESTIVE20')">FESTIVE20 (20%)</span>
+                                <span class="code-pill" style="color:#7e22ce;background:rgba(126,34,206,0.1);padding:0.15rem 0.45rem;border-radius:4px;cursor:pointer;font-size:0.75rem;font-weight:700;" onclick="applyCouponDirectly('WELCOME10')">WELCOME10 (10%)</span>
                             </div>
                         </div>
 
@@ -4707,10 +4931,35 @@
             `;
         }
 
+        function handleApplyCoupon() {
+            const input = document.getElementById('couponCodeInput');
+            const code = input ? input.value.trim().toUpperCase() : '';
+            if (COUPON_REGISTRY[code]) {
+                dispatch({ type: ActionTypes.APPLY_COUPON, payload: COUPON_REGISTRY[code] });
+                showToast(`🎉 Coupon "${code}" applied! ${COUPON_REGISTRY[code].discountPercent}% off.`, 'success');
+            } else {
+                showToast('Invalid coupon code. Try "FESTIVE20" or "WELCOME10"', 'warning');
+            }
+        }
+
+        function applyCouponDirectly(code) {
+            if (COUPON_REGISTRY[code]) {
+                dispatch({ type: ActionTypes.APPLY_COUPON, payload: COUPON_REGISTRY[code] });
+                showToast(`🎉 Coupon "${code}" applied!`, 'success');
+            }
+        }
+
+        function clearCartConfirm() {
+            if (confirm('Are you sure you want to clear your shopping bag?')) {
+                dispatch({ type: ActionTypes.CLEAR_CART });
+                showToast('Shopping bag cleared', 'info');
+            }
+        }
+
         // ============================================================
-        // 11. SMOOTH MULTI-OPTION PAYMENT GATEWAY MODAL
+        // 13. SMOOTH PAYMENT GATEWAY (OWNER VIP ₹7 CR & ALL METHODS)
         // ============================================================
-        let currentPaymentMethod = 'upi';
+        let currentPaymentMethod = 'wallet';
 
         function openPaymentModal() {
             if (state.cart.length === 0) {
@@ -4721,24 +4970,24 @@
             const totalDisplay = document.getElementById('paymentGrandTotalDisplay');
             if (totalDisplay) totalDisplay.innerText = formatINR(calc.grandTotal);
 
-            switchPaymentTab('upi');
+            const isOwner = (state.currentUser && state.currentUser.isOwner && state.currentUser.email === 'cristiano7@gmail.com');
+            if (isOwner) {
+                switchPaymentTab('wallet');
+            } else {
+                switchPaymentTab('upi');
+            }
             document.getElementById('paymentModal').classList.add('open');
-        }
-
-        function triggerDirectCheckout(productId) {
-            handleAddToCart(productId, 1);
-            closeModal('productDetailModal');
-            openPaymentModal();
         }
 
         function switchPaymentTab(tab) {
             currentPaymentMethod = tab;
-            ['payTabUpi', 'payTabCard', 'payTabNet', 'payTabEmi', 'payTabCod'].forEach(id => {
+            ['payTabWallet', 'payTabUpi', 'payTabCard', 'payTabNet', 'payTabEmi', 'payTabCod'].forEach(id => {
                 const btn = document.getElementById(id);
                 if (btn) btn.classList.remove('active');
             });
 
-            if (tab === 'upi') document.getElementById('payTabUpi')?.classList.add('active');
+            if (tab === 'wallet') document.getElementById('payTabWallet')?.classList.add('active');
+            else if (tab === 'upi') document.getElementById('payTabUpi')?.classList.add('active');
             else if (tab === 'card') document.getElementById('payTabCard')?.classList.add('active');
             else if (tab === 'net') document.getElementById('payTabNet')?.classList.add('active');
             else if (tab === 'emi') document.getElementById('payTabEmi')?.classList.add('active');
@@ -4747,7 +4996,65 @@
             const calc = calculateCartFinancials(state.cart, state.appliedCoupon, state.gstRate);
             const content = document.getElementById('paymentTabContent');
 
-            if (tab === 'upi') {
+            if (tab === 'wallet') {
+                const isOwner = (state.currentUser && state.currentUser.isLoggedIn && state.currentUser.isOwner && state.currentUser.email === 'cristiano7@gmail.com');
+                const currentBalance = isOwner ? (state.currentUser.walletBalance || 0) : 0;
+                const remainingBalance = Math.max(0, currentBalance - calc.grandTotal);
+
+                content.innerHTML = `
+                    <div style="background:linear-gradient(135deg, #1e1b4b, #0f172a);border:1.5px solid #f59e0b;border-radius:var(--radius-md);padding:1.5rem;color:white;margin-bottom:1.5rem;box-shadow:0 8px 24px rgba(245,158,11,0.2);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+                            <span style="font-size:0.75rem;text-transform:uppercase;color:#fde047;font-weight:800;letter-spacing:1px;">
+                                <i class="fa-solid fa-crown"></i> BharatCart VIP Treasury Line
+                            </span>
+                            <span style="background:${isOwner ? '#10b981' : '#64748b'};color:white;font-size:0.7rem;font-weight:800;padding:0.15rem 0.5rem;border-radius:999px;">
+                                ${isOwner ? 'OWNER: SWAPNANEEL NASKAR (₹7 CR)' : 'STANDARD USER (₹0)'}
+                            </span>
+                        </div>
+
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;">
+                            <span style="font-size:0.85rem;opacity:0.85;">Current Treasury Balance:</span>
+                            <strong style="font-size:1.8rem;color:#fde047;font-family:'JetBrains Mono';">${formatINR(currentBalance)}</strong>
+                        </div>
+
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;border-top:1px dashed rgba(255,255,255,0.15);padding-top:0.5rem;">
+                            <span style="font-size:0.85rem;opacity:0.85;">Order Amount to Deduct:</span>
+                            <strong style="font-size:1.1rem;color:#ef4444;font-family:'JetBrains Mono';">- ${formatINR(calc.grandTotal)}</strong>
+                        </div>
+
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid rgba(255,255,255,0.25);padding-top:0.6rem;">
+                            <span style="font-size:0.85rem;font-weight:700;">Remaining Balance After Payment:</span>
+                            <strong style="font-size:1.25rem;color:#4ade80;font-family:'JetBrains Mono';">${formatINR(remainingBalance)}</strong>
+                        </div>
+                    </div>
+
+                    ${isOwner ? `
+                        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;text-align:center;">
+                            Instant 1-Click VIP Authorization. Funds will be deducted from your allocated ₹7 Crore treasury account.
+                        </p>
+                        <button class="btn btn-fk-buy btn-lg btn-block" onclick="executeSmoothPayment('BharatCart VIP Treasury Wallet', ${calc.grandTotal})">
+                            <i class="fa-solid fa-crown text-warning"></i> Authorize & Pay ${formatINR(calc.grandTotal)} from VIP Treasury
+                        </button>
+                    ` : `
+                        <div style="text-align:center;padding:1rem;">
+                            <p style="font-size:0.88rem;color:#b91c1c;margin-bottom:1rem;font-weight:700;">
+                                The ₹7 Crore Treasury is exclusively assigned to the Owner (cristiano7@gmail.com). Rest no one can access this treasury.
+                            </p>
+                            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;">
+                                Please select another payment method (UPI, Card, Net Banking, EMI, or COD) or log in with Owner credentials.
+                            </p>
+                            <div style="display:flex;gap:0.75rem;justify-content:center;">
+                                <button class="btn btn-primary" onclick="switchPaymentTab('upi')">
+                                    Pay with Merchant UPI
+                                </button>
+                                <button class="btn btn-outline" onclick="closeModal('paymentModal'); openAuthModal();">
+                                    Owner Login
+                                </button>
+                            </div>
+                        </div>
+                    `}
+                `;
+            } else if (tab === 'upi') {
                 content.innerHTML = `
                     <div style="text-align:center;">
                         <h4 style="font-size:1.1rem;font-weight:800;color:var(--secondary);margin-bottom:0.4rem;">
@@ -4784,7 +5091,6 @@
                 `;
             } else if (tab === 'card') {
                 content.innerHTML = `
-                    <!-- 3D Card Visualizer -->
                     <div class="card-visualizer">
                         <div class="card-chip"></div>
                         <div style="font-size:1.25rem;letter-spacing:2px;font-family:'JetBrains Mono';margin-bottom:1rem;text-shadow:0 1px 2px rgba(0,0,0,0.5);">
@@ -4793,7 +5099,7 @@
                         <div style="display:flex;justify-content:space-between;align-items:flex-end;">
                             <div>
                                 <span style="font-size:0.65rem;text-transform:uppercase;opacity:0.7;">Cardholder Name</span>
-                                <div style="font-size:0.95rem;font-weight:700;">Swapnaneel Naskar</div>
+                                <div style="font-size:0.95rem;font-weight:700;">${state.currentUser.name}</div>
                             </div>
                             <div>
                                 <span style="font-size:0.65rem;text-transform:uppercase;opacity:0.7;">Expires</span>
@@ -4803,7 +5109,6 @@
                         </div>
                     </div>
 
-                    <!-- Card Form -->
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
                         <div style="grid-column:1 / -1;">
                             <label style="font-size:0.8rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Card Number</label>
@@ -4845,7 +5150,7 @@
                     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--radius-md);padding:1rem;margin-bottom:1.5rem;">
                         <span style="font-size:0.75rem;font-weight:800;color:#166534;text-transform:uppercase;">Pre-Approved Limit</span>
                         <h3 style="font-size:1.35rem;font-weight:800;color:#15803d;margin:0.25rem 0;">₹1,00,000 BharatCart PayLater Credit</h3>
-                        <div style="font-size:0.82rem;color:#166534;">Assigned to customer: <strong>Swapnaneel Naskar</strong> • 0% Interest Rate</div>
+                        <div style="font-size:0.82rem;color:#166534;">Assigned to customer: <strong>${state.currentUser.name}</strong> • 0% Interest Rate</div>
                     </div>
 
                     <h4 style="font-size:0.95rem;font-weight:800;color:var(--secondary);margin-bottom:0.75rem;">Choose No-Cost EMI Plan</h4>
@@ -4899,151 +5204,198 @@
         }
 
         // ============================================================
-        // 12. PAYMENT EXECUTION WITH 3-STEP ANIMATED OVERLAY
+        // 14. PAYMENT EXECUTION WITH 3-STEP ANIMATED OVERLAY & WALLET DEDUCTION
         // ============================================================
-        function executeSmoothPayment(methodName) {
+        function executeSmoothPayment(methodName, walletDeductAmount = 0) {
             closeModal('paymentModal');
-
             const overlay = document.getElementById('paymentProcessingOverlay');
             overlay.classList.add('open');
 
-            const title = document.getElementById('processingStepTitle');
-            const sub = document.getElementById('processingStepSub');
-            const s1 = document.getElementById('pStep1');
-            const s2 = document.getElementById('pStep2');
-            const s3 = document.getElementById('pStep3');
+            const stepTitle = document.getElementById('processingStepTitle');
+            const stepSub = document.getElementById('processingStepSub');
+            const p1 = document.getElementById('pStep1');
+            const p2 = document.getElementById('pStep2');
+            const p3 = document.getElementById('pStep3');
 
-            // Step 1: Handshake
-            title.innerText = 'Step 1: Establishing 256-bit TLS Handshake...';
-            sub.innerText = 'Securing transmission for customer Swapnaneel Naskar...';
-            s1.style.background = '#10b981';
+            stepTitle.innerText = "Encrypting Banking Payload...";
+            stepSub.innerText = `Establishing 256-bit SSL Handshake with Merchant Gateway for ${state.currentUser.name}...`;
 
             setTimeout(() => {
-                // Step 2: Auth
-                title.innerText = 'Step 2: Authenticating with Banking Gateway & NPCI...';
-                sub.innerText = `Authorizing transaction via ${methodName}...`;
-                s2.style.background = '#10b981';
-
-                setTimeout(() => {
-                    // Step 3: Success & GST Invoice
-                    title.innerText = 'Step 3: Payment Authorized & Official GST Invoice Generated!';
-                    sub.innerText = 'All items verified. 18% GST (CGST 9% + SGST 9%) registered under Karnataka jurisdiction.';
-                    s3.style.background = '#10b981';
-
-                    setTimeout(() => {
-                        overlay.classList.remove('open');
-                        completeOrderPlacement(methodName);
-                    }, 700);
-                }, 900);
+                p2.style.background = "#4f46e5";
+                stepTitle.innerText = `Authorizing with ${methodName}...`;
+                stepSub.innerText = "Validating payment credentials & NPCI clearinghouse clearance...";
             }, 800);
+
+            setTimeout(() => {
+                p3.style.background = "#4f46e5";
+                stepTitle.innerText = "Generating 18% Official GST Tax Invoice...";
+                stepSub.innerText = "Recording IRN & QR signature in National Invoice Registry...";
+            }, 1600);
+
+            setTimeout(() => {
+                overlay.classList.remove('open');
+                p2.style.background = "rgba(255,255,255,0.2)";
+                p3.style.background = "rgba(255,255,255,0.2)";
+
+                // Deduct from VIP Wallet balance if applicable and user is owner
+                if (walletDeductAmount > 0 && state.currentUser && state.currentUser.isOwner && state.currentUser.email === 'cristiano7@gmail.com') {
+                    state.currentUser.walletBalance = Math.max(0, state.currentUser.walletBalance - walletDeductAmount);
+                    updateHeaderBadges();
+                }
+
+                finalizeOrderSuccess(methodName);
+            }, 2400);
         }
 
-        let latestOrderId = '';
-
-        function completeOrderPlacement(methodName) {
+        function finalizeOrderSuccess(methodName) {
             const calc = calculateCartFinancials(state.cart, state.appliedCoupon, state.gstRate);
-            latestOrderId = 'BC-2026-' + Math.floor(10000 + Math.random() * 90000);
+            const orderId = `BC-2026-${Math.floor(10000 + Math.random() * 90000)}`;
 
             const newOrder = {
-                orderId: latestOrderId,
-                dateFormatted: new Date().toLocaleDateString('en-IN', {
-                    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                }),
-                customer: {
-                    name: 'Swapnaneel Naskar',
-                    email: 'swapnaneelnaskar2903@gmail.com',
-                    phone: '+91 98765 43210',
-                    address: 'Flat 402, Royal Residency, Outer Ring Road, Bengaluru, Karnataka - 560103'
-                },
+                orderId: orderId,
                 items: [...state.cart],
                 financials: calc,
                 paymentMethod: methodName,
-                status: 'PAID & VERIFIED'
+                customer: { ...state.currentUser },
+                createdAt: new Date().toISOString()
             };
 
-            dispatch({ type: ActionTypes.PLACE_ORDER, payload: { order: newOrder } });
+            dispatch({ type: ActionTypes.PLACE_ORDER, payload: newOrder });
 
-            // Trigger celebration confetti
-            triggerConfetti();
-
-            // Populate Success Modal
-            document.getElementById('successOrderId').innerText = latestOrderId;
+            document.getElementById('successOrderId').innerText = orderId;
             document.getElementById('successPaymentMethod').innerText = methodName;
             document.getElementById('successTotalPaid').innerText = formatINR(calc.grandTotal);
+
+            triggerCelebrationConfetti();
             document.getElementById('orderSuccessModal').classList.add('open');
         }
 
-        function downloadLatestInvoice() {
-            closeModal('orderSuccessModal');
-            viewOrderInvoice(latestOrderId);
+        // ============================================================
+        // 15. CELEBRATION CONFETTI PARTICLE SYSTEM
+        // ============================================================
+        function triggerCelebrationConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            if (!canvas) return;
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            canvas.style.display = 'block';
+
+            const ctx = canvas.getContext('2d');
+            const particles = [];
+            const colors = ['#4f46e5', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#38bdf8'];
+
+            for (let i = 0; i < 120; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    w: Math.random() * 10 + 6,
+                    h: Math.random() * 6 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vx: (Math.random() - 0.5) * 16,
+                    vy: (Math.random() - 0.7) * 18,
+                    rotation: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 12,
+                    opacity: 1
+                });
+            }
+
+            let animationFrame;
+            const startTime = Date.now();
+
+            function renderConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const elapsed = Date.now() - startTime;
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.45;
+                    p.rotation += p.vRot;
+                    if (elapsed > 1800) {
+                        p.opacity = Math.max(0, p.opacity - 0.02);
+                    }
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.globalAlpha = p.opacity;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctx.restore();
+                });
+
+                if (elapsed < 3200) {
+                    animationFrame = requestAnimationFrame(renderConfetti);
+                } else {
+                    cancelAnimationFrame(animationFrame);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    canvas.style.display = 'none';
+                }
+            }
+
+            renderConfetti();
         }
 
         // ============================================================
-        // 13. OFFICIAL GST TAX INVOICE & useReducer CALCULATION ENGINE
+        // 16. GST BREAKDOWN MODAL (useReducer Controlled)
         // ============================================================
         function openGstModal() {
             const calc = calculateCartFinancials(state.cart, state.appliedCoupon, state.gstRate);
-            const modalBody = document.getElementById('gstModalBody');
+            const body = document.getElementById('gstModalBody');
 
-            modalBody.innerHTML = `
-                <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:var(--radius-md);padding:1.25rem;margin-bottom:1.5rem;">
+            body.innerHTML = `
+                <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-md);padding:1.25rem;margin-bottom:1.5rem;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-                        <span style="font-size:0.78rem;font-weight:800;color:#92400e;text-transform:uppercase;">
-                            Goods and Services Tax (GST) Act, 2017
-                        </span>
-                        <span class="btn-gst-amber btn-sm" style="pointer-events:none;">
-                            Active Rate: 18% Total
-                        </span>
+                        <span style="font-size:0.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Tax Compliance Standard:</span>
+                        <strong style="color:var(--primary);font-size:0.85rem;">GSTIN: 29AABCU9603R1ZM</strong>
                     </div>
-                    <div style="font-size:0.85rem;color:#78350f;line-height:1.5;">
-                        Intra-State Supply (Karnataka State Code: 29). Standardized 18% GST split evenly into <strong>Central GST (CGST @ 9%)</strong> and <strong>State GST (SGST @ 9%)</strong> with Input Tax Credit (ITC) eligibility for Swapnaneel Naskar.
+                    <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;margin:0;">
+                        In accordance with the Central Goods and Services Tax Act 2017, all unified transactions through BharatCart are invoiced with an aggregate <strong>18% GST</strong> split equally between CGST (9%) and SGST (9%).
+                    </p>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:0.75rem;font-size:0.92rem;margin-bottom:1.5rem;">
+                    <div style="display:flex;justify-content:space-between;padding-bottom:0.5rem;border-bottom:1px solid var(--border);">
+                        <span>Total Items in Bag:</span>
+                        <strong>${calc.totalItemCount} Units</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;">
+                        <span>Gross Merchandise Value (GMV):</span>
+                        <span>${formatINR(calc.subtotal)}</span>
+                    </div>
+                    ${calc.discountAmount > 0 ? `
+                        <div style="display:flex;justify-content:space-between;color:var(--success);">
+                            <span>Promotional Coupon Discount (${calc.discountPercent}%):</span>
+                            <span>- ${formatINR(calc.discountAmount)}</span>
+                        </div>
+                    ` : ''}
+                    <div style="display:flex;justify-content:space-between;font-weight:700;">
+                        <span>Taxable Value (Net Assessment):</span>
+                        <span>${formatINR(calc.taxableSubtotal)}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding-left:1rem;color:var(--primary);">
+                        <span>• Central GST (CGST @ 9%):</span>
+                        <strong>${formatINR(calc.cgstAmount)}</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding-left:1rem;color:var(--primary);">
+                        <span>• State GST (SGST @ 9%):</span>
+                        <strong>${formatINR(calc.sgstAmount)}</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;border-top:1px dashed var(--border);padding-top:0.5rem;font-weight:800;color:var(--primary);">
+                        <span>Combined 18% GST Total:</span>
+                        <span>${formatINR(calc.totalGst)}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:1.25rem;font-weight:800;color:var(--secondary);border-top:2px solid var(--border);padding-top:0.75rem;">
+                        <span>Net Payable Amount:</span>
+                        <span style="color:var(--primary);">${formatINR(calc.grandTotal)}</span>
                     </div>
                 </div>
 
-                <!-- Financials Table -->
-                <table style="width:100%;border-collapse:collapse;font-size:0.9rem;margin-bottom:1.5rem;">
-                    <tbody>
-                        <tr style="border-bottom:1px solid var(--border);">
-                            <td style="padding:0.6rem 0;color:var(--text-muted);">Cart Gross Subtotal:</td>
-                            <td style="padding:0.6rem 0;text-align:right;font-weight:700;">${formatINR(calc.subtotal)}</td>
-                        </tr>
-                        ${calc.discountAmount > 0 ? `
-                            <tr style="border-bottom:1px solid var(--border);color:var(--success);">
-                                <td style="padding:0.6rem 0;">Promo Discount (${calc.discountPercent}% OFF):</td>
-                                <td style="padding:0.6rem 0;text-align:right;font-weight:700;">- ${formatINR(calc.discountAmount)}</td>
-                            </tr>
-                        ` : ''}
-                        <tr style="border-bottom:1px solid var(--border);">
-                            <td style="padding:0.6rem 0;font-weight:700;color:var(--secondary);">Taxable Value (Base):</td>
-                            <td style="padding:0.6rem 0;text-align:right;font-weight:700;color:var(--secondary);">${formatINR(calc.taxableSubtotal)}</td>
-                        </tr>
-                        <tr style="border-bottom:1px solid var(--border);color:var(--primary);">
-                            <td style="padding:0.6rem 0;">• Central GST (CGST @ 9%):</td>
-                            <td style="padding:0.6rem 0;text-align:right;font-weight:700;">${formatINR(calc.cgstAmount)}</td>
-                        </tr>
-                        <tr style="border-bottom:1px solid var(--border);color:var(--primary);">
-                            <td style="padding:0.6rem 0;">• State GST (SGST @ 9%):</td>
-                            <td style="padding:0.6rem 0;text-align:right;font-weight:700;">${formatINR(calc.sgstAmount)}</td>
-                        </tr>
-                        <tr style="border-bottom:1px solid var(--border);background:#f8fafc;font-weight:800;">
-                            <td style="padding:0.75rem 0.5rem;color:var(--secondary);">Total GST Assessment (18%):</td>
-                            <td style="padding:0.75rem 0.5rem;text-align:right;color:var(--primary);font-size:1.05rem;">${formatINR(calc.totalGst)}</td>
-                        </tr>
-                        <tr style="border-bottom:1px solid var(--border);">
-                            <td style="padding:0.6rem 0;color:var(--text-muted);">Delivery & Logistics Surcharge:</td>
-                            <td style="padding:0.6rem 0;text-align:right;font-weight:700;">${calc.deliveryFee === 0 ? '<strong style="color:var(--success);">FREE</strong>' : formatINR(calc.deliveryFee)}</td>
-                        </tr>
-                        <tr style="font-size:1.25rem;font-weight:800;">
-                            <td style="padding:0.85rem 0;color:var(--secondary);">Final Grand Total:</td>
-                            <td style="padding:0.85rem 0;text-align:right;color:var(--primary);">${formatINR(calc.grandTotal)}</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div style="display:flex;gap:1rem;justify-content:flex-end;">
-                    <button class="btn btn-outline btn-sm" onclick="closeModal('gstCalculationModal')">Close</button>
-                    <button class="btn-gst-amber btn-sm" onclick="closeModal('gstCalculationModal'); openInvoicePreviewModal();">
-                        <i class="fa-solid fa-file-invoice"></i> View Official GST Tax Invoice
+                <div style="display:flex;justify-content:flex-end;gap:1rem;">
+                    <button class="btn btn-outline" onclick="closeModal('gstCalculationModal')">Close</button>
+                    <button class="btn-gst-amber" onclick="closeModal('gstCalculationModal'); openPaymentModal();">
+                        Proceed with 18% GST Invoice
                     </button>
                 </div>
             `;
@@ -5051,98 +5403,117 @@
             document.getElementById('gstCalculationModal').classList.add('open');
         }
 
-        function viewOrderInvoice(orderId) {
-            const order = state.orders.find(o => o.orderId === orderId);
-            if (!order) return;
-            renderInvoiceInModal(order.orderId, order.items, order.financials, order.customer, order.dateFormatted);
-        }
+        // ============================================================
+        // 17. OFFICIAL GST TAX INVOICE GENERATOR & MODAL
+        // ============================================================
+        function downloadLatestInvoice() {
+            const latestOrder = state.orders[0];
+            if (!latestOrder) {
+                showToast('No recent order found to generate invoice.', 'warning');
+                return;
+            }
 
-        function openInvoicePreviewModal() {
-            const calc = calculateCartFinancials(state.cart, state.appliedCoupon, state.gstRate);
-            renderInvoiceInModal('DRAFT-' + Date.now().toString().slice(-6), state.cart, calc);
-        }
-
-        function renderInvoiceInModal(invNumber, items, financials, customer = null, dateStr = null) {
-            const custName = 'Swapnaneel Naskar';
-            const custAddress = 'Flat 402, Royal Residency, Outer Ring Road, Bengaluru, Karnataka - 560103';
-            const invDate = dateStr || new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-
-            const modalBody = document.getElementById('invoiceModalBody');
-            modalBody.innerHTML = `
-                <div style="border:2px solid var(--border);padding:2rem;border-radius:var(--radius-md);background:white;">
-                    <div style="display:flex;justify-content:space-between;border-bottom:2px solid var(--secondary);padding-bottom:1rem;margin-bottom:1.25rem;">
+            const invBody = document.getElementById('invoiceModalBody');
+            invBody.innerHTML = `
+                <div style="border:2px solid #0f172a;padding:2rem;background:white;font-family:'Plus Jakarta Sans',sans-serif;color:#0f172a;">
+                    <!-- Invoice Header -->
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0f172a;padding-bottom:1.5rem;margin-bottom:1.5rem;">
                         <div>
-                            <h2 style="font-size:1.6rem;font-weight:800;color:var(--secondary);"><i class="fa-solid fa-cart-shopping text-primary"></i> BharatCart Private Limited</h2>
-                            <small style="color:var(--text-muted);display:block;">India's Premier E-Commerce & Unified Logistics Portal</small>
-                            <small style="color:var(--text-muted);">GSTIN: <strong>29AABCU9603R1ZM</strong> (State Code: 29)</small>
+                            <h2 style="font-size:1.6rem;font-weight:800;color:#0f172a;margin:0;">BHARATCART RETAIL PRIVATE LIMITED</h2>
+                            <p style="font-size:0.8rem;color:#475569;margin:0.25rem 0 0;line-height:1.4;">
+                                CIN: U52100KA2026PTC198421 • GSTIN: <strong>29AABCU9603R1ZM</strong><br />
+                                Registered Office: Outer Ring Road, Tech Corridor, Bengaluru - 560103
+                            </p>
                         </div>
                         <div style="text-align:right;">
-                            <div style="font-size:1.15rem;font-weight:800;color:var(--primary);">TAX INVOICE</div>
-                            <div><strong>Invoice #:</strong> ${invNumber}</div>
-                            <div><strong>Date:</strong> ${invDate}</div>
+                            <span style="font-size:1.1rem;font-weight:800;background:#0f172a;color:white;padding:0.3rem 0.8rem;border-radius:4px;display:inline-block;margin-bottom:0.4rem;">
+                                TAX INVOICE
+                            </span>
+                            <div style="font-size:0.85rem;font-weight:700;">Invoice No: INV-${latestOrder.orderId}</div>
+                            <div style="font-size:0.8rem;color:#475569;">Date: ${new Date(latestOrder.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
                         </div>
                     </div>
 
-                    <div style="display:flex;justify-content:space-between;margin-bottom:1.5rem;font-size:0.88rem;">
+                    <!-- Bill To & Ship To Grid -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:1.5rem;font-size:0.85rem;">
                         <div>
-                            <strong>Billed To:</strong><br />
-                            <strong>${custName}</strong><br />
-                            ${custAddress}<br />
-                            Place of Supply: Karnataka (State Code: 29)
+                            <strong style="text-transform:uppercase;color:#64748b;font-size:0.75rem;">Billed To / Customer:</strong>
+                            <div style="font-weight:800;font-size:1rem;color:#0f172a;margin:0.2rem 0;">${latestOrder.customer.name}</div>
+                            <div style="color:#475569;">${latestOrder.customer.email}</div>
+                            <div style="color:#475569;">${latestOrder.customer.phone}</div>
+                            <div style="color:#475569;margin-top:0.2rem;">${latestOrder.customer.address}</div>
                         </div>
                         <div style="text-align:right;">
-                            <strong>Dispatched / Issued By:</strong><br />
-                            BharatCart Mega Fulfillment & Logistics Hub<br />
-                            Whitefield, Bengaluru - 560066<br />
-                            Tax Regime: Intra-State (CGST 9% + SGST 9%)
+                            <strong style="text-transform:uppercase;color:#64748b;font-size:0.75rem;">Payment Authorization:</strong>
+                            <div style="font-weight:800;font-size:0.95rem;color:#10b981;margin:0.2rem 0;">SUCCESSFULLY CLEARED</div>
+                            <div style="color:#475569;">Method: <strong>${latestOrder.paymentMethod}</strong></div>
+                            <div style="color:#475569;">Place of Supply: Karnataka (State Code 29)</div>
                         </div>
                     </div>
 
-                    <table style="width:100%;border-collapse:collapse;font-size:0.88rem;margin:1.25rem 0;">
+                    <!-- Invoice Items Table -->
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:0.85rem;">
                         <thead>
-                            <tr style="background:#f1f5f9;">
-                                <th style="padding:0.6rem;border:1px solid #cbd5e1;text-align:left;">#</th>
-                                <th style="padding:0.6rem;border:1px solid #cbd5e1;text-align:left;">Description / Service Details</th>
-                                <th style="padding:0.6rem;border:1px solid #cbd5e1;text-align:center;">HSN / SAC</th>
-                                <th style="padding:0.6rem;border:1px solid #cbd5e1;text-align:right;">Unit Price</th>
-                                <th style="padding:0.6rem;border:1px solid #cbd5e1;text-align:center;">Qty</th>
-                                <th style="padding:0.6rem;border:1px solid #cbd5e1;text-align:right;">Net Total</th>
+                            <tr style="background:#f1f5f9;border-top:1px solid #cbd5e1;border-bottom:1px solid #cbd5e1;text-align:left;">
+                                <th style="padding:0.6rem 0.5rem;">#</th>
+                                <th style="padding:0.6rem 0.5rem;">Item Description</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:center;">HSN / SAC</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:center;">Qty</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:right;">Rate</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:right;">Taxable Value</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${items.map((item, idx) => `
-                                <tr>
-                                    <td style="padding:0.6rem;border:1px solid #e2e8f0;">${idx + 1}</td>
-                                    <td style="padding:0.6rem;border:1px solid #e2e8f0;">
-                                        <strong>${item.product.name}</strong>
-                                        ${item.options && item.options.pnr ? `<br /><small style="color:#0284c7;">PNR: ${item.options.pnr} | Seats: ${item.options.seats}</small>` : ''}
-                                        ${item.options && item.options.biometricFit ? `<br /><small style="color:#7c3aed;">FitVerse Profile: ${item.options.biometricFit}</small>` : ''}
+                            ${latestOrder.items.map((it, idx) => `
+                                <tr style="border-bottom:1px solid #e2e8f0;">
+                                    <td style="padding:0.6rem 0.5rem;">${idx + 1}</td>
+                                    <td style="padding:0.6rem 0.5rem;">
+                                        <strong>${it.product.name}</strong>
+                                        ${it.options?.storage ? `<div style="font-size:0.75rem;color:#64748b;">Storage: ${it.options.storage}</div>` : ''}
+                                        ${it.options?.color ? `<div style="font-size:0.75rem;color:#64748b;">Color: ${it.options.color}</div>` : ''}
+                                        ${it.options?.pnr ? `<div style="font-size:0.75rem;color:#0284c7;">PNR: ${it.options.pnr}</div>` : ''}
                                     </td>
-                                    <td style="padding:0.6rem;border:1px solid #e2e8f0;text-align:center;">${item.options && item.options.isTravel ? '9964' : '8517'}</td>
-                                    <td style="padding:0.6rem;border:1px solid #e2e8f0;text-align:right;font-family:'JetBrains Mono';">${formatINR(item.product.price)}</td>
-                                    <td style="padding:0.6rem;border:1px solid #e2e8f0;text-align:center;">${item.quantity}</td>
-                                    <td style="padding:0.6rem;border:1px solid #e2e8f0;text-align:right;font-family:'JetBrains Mono';">${formatINR(item.product.price * item.quantity)}</td>
+                                    <td style="padding:0.6rem 0.5rem;text-align:center;font-family:'JetBrains Mono';">8517</td>
+                                    <td style="padding:0.6rem 0.5rem;text-align:center;">${it.quantity}</td>
+                                    <td style="padding:0.6rem 0.5rem;text-align:right;">${formatINR(it.product.price)}</td>
+                                    <td style="padding:0.6rem 0.5rem;text-align:right;">${formatINR(it.product.price * it.quantity)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
 
+                    <!-- Totals & Taxes Table -->
                     <div style="display:flex;justify-content:flex-end;">
-                        <div style="min-width:320px;font-size:0.9rem;">
-                            <div style="display:flex;justify-content:space-between;padding:0.3rem 0;"><span>Subtotal:</span><strong>${formatINR(financials.subtotal)}</strong></div>
-                            ${financials.discountAmount > 0 ? `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;color:var(--success);"><span>Coupon (${financials.discountPercent}%):</span><strong>- ${formatINR(financials.discountAmount)}</strong></div>` : ''}
-                            <div style="display:flex;justify-content:space-between;padding:0.3rem 0;"><span>Taxable Base:</span><strong>${formatINR(financials.taxableSubtotal)}</strong></div>
-                            <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-top:1px dashed #cbd5e1;"><span>CGST (9%):</span><span>${formatINR(financials.cgstAmount)}</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:0.3rem 0;"><span>SGST (9%):</span><span>${formatINR(financials.sgstAmount)}</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:0.3rem 0;"><span>Delivery Fee:</span><span>${financials.deliveryFee === 0 ? 'FREE' : formatINR(financials.deliveryFee)}</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:0.75rem 0;border-top:2px solid var(--secondary);font-size:1.25rem;font-weight:800;">
-                                <span>Grand Total (INR):</span><span style="color:var(--primary);">${formatINR(financials.grandTotal)}</span>
+                        <div style="width:340px;display:flex;flex-direction:column;gap:0.4rem;font-size:0.85rem;">
+                            <div style="display:flex;justify-content:space-between;">
+                                <span>Taxable Subtotal:</span>
+                                <strong>${formatINR(latestOrder.financials.taxableSubtotal)}</strong>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;color:#4f46e5;">
+                                <span>Central GST (CGST @ 9%):</span>
+                                <strong>${formatINR(latestOrder.financials.cgstAmount)}</strong>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;color:#4f46e5;">
+                                <span>State GST (SGST @ 9%):</span>
+                                <strong>${formatINR(latestOrder.financials.sgstAmount)}</strong>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;border-top:2px solid #0f172a;padding-top:0.5rem;font-size:1.15rem;font-weight:800;">
+                                <span>Total Amount Paid:</span>
+                                <span style="color:#0f172a;">${formatINR(latestOrder.financials.grandTotal)}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid #e2e8f0;font-size:0.78rem;color:var(--text-muted);text-align:center;">
-                        This is an official computer-generated GST tax invoice valid under Section 31 of CGST Act, 2017. Billed to Swapnaneel Naskar.
+                    <!-- Footer Stamp & Declaration -->
+                    <div style="border-top:1px dashed #cbd5e1;margin-top:2rem;padding-top:1rem;display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:#64748b;">
+                        <div>
+                            This is a digitally generated Tax Invoice verified under GST Section 31.<br />
+                            Generated for: <strong>${latestOrder.customer.name}</strong>. No physical signature required.
+                        </div>
+                        <div style="text-align:right;">
+                            <strong>For BharatCart Retail Private Limited</strong><br />
+                            <span style="font-size:0.7rem;">Authorized Financial Signatory</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -5151,16 +5522,18 @@
         }
 
         // ============================================================
-        // 14. ORDERS HISTORY VIEW
+        // 18. ORDERS PAGE & COMPARISON MODAL
         // ============================================================
         function renderOrdersPage() {
             if (state.orders.length === 0) {
                 return `
                     <div style="text-align:center;padding:4rem 2rem;background:white;border-radius:var(--radius-lg);border:1px solid var(--border);max-width:620px;margin:2rem auto;">
-                        <div style="font-size:3.5rem;color:var(--primary);margin-bottom:1rem;"><i class="fa-solid fa-box-open"></i></div>
-                        <h3 style="font-size:1.5rem;font-weight:800;color:var(--secondary);">No Orders Placed Yet</h3>
-                        <p style="color:var(--text-muted);margin:0.5rem 0 1.5rem;">Completed transactions, flight tickets, and GST invoices for Swapnaneel Naskar will be archived here.</p>
-                        <button class="btn btn-primary" onclick="navigateTo('products')">Browse Catalog</button>
+                        <div style="font-size:3.5rem;color:var(--text-muted);margin-bottom:1rem;"><i class="fa-solid fa-box-open"></i></div>
+                        <h3 style="font-size:1.6rem;font-weight:800;color:var(--secondary);">No Order History Found</h3>
+                        <p style="color:var(--text-muted);margin:0.5rem 0 1.5rem;line-height:1.5;">
+                            Orders placed by <strong>${state.currentUser.name}</strong> will appear here with full 18% GST tax invoices and live tracking status.
+                        </p>
+                        <button class="btn btn-primary btn-lg" onclick="navigateTo('products')">Browse Products</button>
                     </div>
                 `;
             }
@@ -5169,40 +5542,48 @@
                 <div class="section-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
                     <div>
                         <h2 style="font-size:1.6rem;font-weight:800;color:var(--secondary);margin:0;">
-                            Order & Booking History
+                            My Orders & GST Invoices
                         </h2>
                         <p style="font-size:0.85rem;color:var(--text-muted);margin:0.25rem 0 0;">
-                            Customer: Swapnaneel Naskar (${state.currentUser.email})
+                            Showing ${state.orders.length} verified order(s) for user: ${state.currentUser.name}
                         </p>
                     </div>
                 </div>
 
-                <div>
+                <div style="display:flex;flex-direction:column;gap:1.5rem;">
                     ${state.orders.map(order => `
-                        <div style="background:white;padding:1.5rem;border-radius:var(--radius-md);border:1px solid var(--border);margin-bottom:1.25rem;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:0.75rem;margin-bottom:0.75rem;flex-wrap:wrap;gap:0.5rem;">
+                        <div style="background:white;border-radius:var(--radius-md);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);">
+                            <div style="background:#f8fafc;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:0.75rem;">
                                 <div>
-                                    <strong style="font-size:1.05rem;color:var(--secondary);">Order #${order.orderId}</strong>
-                                    <div style="font-size:0.8rem;color:var(--text-muted);">${order.dateFormatted} • Paid via ${order.paymentMethod}</div>
+                                    <span style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Order ID</span>
+                                    <div style="font-size:0.95rem;font-weight:800;color:var(--secondary);font-family:'JetBrains Mono';">${order.orderId}</div>
                                 </div>
-                                <div style="text-align:right;">
-                                    <span style="background:#ecfdf5;color:#065f46;font-size:0.75rem;font-weight:800;padding:0.2rem 0.6rem;border-radius:999px;">${order.status}</span>
-                                    <div style="font-size:1.25rem;font-weight:800;margin-top:2px;color:var(--primary);">${formatINR(order.financials.grandTotal)}</div>
+                                <div>
+                                    <span style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Placed On</span>
+                                    <div style="font-size:0.85rem;font-weight:700;">${new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                                </div>
+                                <div>
+                                    <span style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Total Amount</span>
+                                    <div style="font-size:1.1rem;font-weight:800;color:var(--primary);">${formatINR(order.financials.grandTotal)}</div>
+                                </div>
+                                <div style="display:flex;gap:0.5rem;">
+                                    <button class="btn btn-outline btn-sm" onclick="downloadLatestInvoice()">
+                                        <i class="fa-solid fa-file-invoice"></i> GST Invoice
+                                    </button>
                                 </div>
                             </div>
-                            <div style="margin-bottom:1rem;">
-                                ${order.items.map(item => `
-                                    <div style="display:flex;justify-content:space-between;font-size:0.88rem;padding:0.3rem 0;">
-                                        <span>${item.product.name} × ${item.quantity}</span>
-                                        <strong>${formatINR(item.product.price * item.quantity)}</strong>
+
+                            <div style="padding:1.5rem;">
+                                ${order.items.map(it => `
+                                    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+                                        <img src="${it.product.image}" style="width:60px;height:60px;object-fit:contain;border:1px solid var(--border);border-radius:6px;padding:2px;" />
+                                        <div style="flex:1;">
+                                            <h4 style="font-size:0.92rem;font-weight:700;color:var(--secondary);margin-bottom:0.2rem;">${it.product.name}</h4>
+                                            <div style="font-size:0.8rem;color:var(--text-muted);">Qty: ${it.quantity} • Unit Price: ${formatINR(it.product.price)}</div>
+                                        </div>
+                                        <strong style="font-size:0.95rem;color:var(--secondary);">${formatINR(it.product.price * it.quantity)}</strong>
                                     </div>
                                 `).join('')}
-                            </div>
-                            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:0.75rem;border-top:1px solid var(--border);font-size:0.82rem;color:var(--text-muted);flex-wrap:wrap;gap:0.5rem;">
-                                <div>Total 18% GST Paid: <strong>${formatINR(order.financials.totalGst)}</strong> (ITC Eligible)</div>
-                                <button class="btn btn-outline btn-sm" onclick="viewOrderInvoice('${order.orderId}')">
-                                    <i class="fa-solid fa-file-invoice"></i> Download GST Tax Invoice
-                                </button>
                             </div>
                         </div>
                     `).join('')}
@@ -5210,140 +5591,34 @@
             `;
         }
 
-        // ============================================================
-        // 15. COMPARISON TOOL & MODAL
-        // ============================================================
-        function toggleCompare(productId) {
-            const product = BASE_PRODUCTS.find(p => p.id === productId);
-            if (!product) return;
-            const exists = state.compareList.find(p => p.id === productId);
-            if (exists) {
-                dispatch({ type: ActionTypes.REMOVE_COMPARE, payload: { productId } });
-                showToast(`Removed from comparison`, 'info');
-            } else {
-                if (state.compareList.length >= 3) {
-                    showToast('You can compare up to 3 items side-by-side', 'warning');
-                    return;
-                }
-                dispatch({ type: ActionTypes.ADD_COMPARE, payload: { product } });
-                showToast(`Added to compare tool!`, 'success');
-            }
-        }
-
         function openCompareModal() {
             if (state.compareList.length === 0) {
-                showToast('Compare list is empty! Click the compare icon on product cards.', 'info');
+                showToast('Add devices to compare first!', 'info');
                 return;
             }
-            const modalBody = document.getElementById('compareModalBody');
-            modalBody.innerHTML = `
+
+            const body = document.getElementById('compareModalBody');
+            body.innerHTML = `
                 <div style="display:grid;grid-template-columns:repeat(${state.compareList.length}, 1fr);gap:1.5rem;">
                     ${state.compareList.map(p => `
-                        <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:1rem;background:#fafafc;">
-                            <div style="height:140px;display:flex;align-items:center;justify-content:center;background:white;border-radius:6px;padding:0.5rem;margin-bottom:0.75rem;">
+                        <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:1.25rem;text-align:center;background:#fafafc;">
+                            <div style="height:140px;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem;">
                                 <img src="${p.image}" style="max-height:100%;max-width:100%;object-fit:contain;" />
                             </div>
-                            <h4 style="font-size:0.92rem;font-weight:800;color:var(--secondary);margin-bottom:0.35rem;">${p.name}</h4>
+                            <h4 style="font-size:0.95rem;font-weight:800;color:var(--secondary);margin-bottom:0.4rem;">${p.name}</h4>
                             <div style="font-size:1.15rem;font-weight:800;color:var(--primary);margin-bottom:0.75rem;">${formatINR(p.price)}</div>
-                            <div style="font-size:0.8rem;line-height:1.6;color:var(--text-muted);border-top:1px solid var(--border);padding-top:0.5rem;">
-                                <div><strong>Category:</strong> ${p.category}</div>
-                                <div><strong>Rating:</strong> ${p.rating || '4.5'} ★</div>
-                                <div><strong>GST Rate:</strong> 18%</div>
-                            </div>
-                            <button class="btn btn-fk-buy btn-sm btn-block" style="margin-top:1rem;" onclick="handleAddToCart('${p.id}'); closeModal('compareModal');">
-                                Add to Bag
+                            <button class="btn btn-fk-buy btn-sm btn-block" onclick="handleAddToCart('${p.id}'); closeModal('compareModal');">
+                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                            </button>
+                            <button class="btn btn-subtle btn-sm btn-block text-danger" style="margin-top:0.4rem;" onclick="toggleCompare('${p.id}'); openCompareModal();">
+                                Remove
                             </button>
                         </div>
                     `).join('')}
                 </div>
             `;
+
             document.getElementById('compareModal').classList.add('open');
-        }
-
-        // ============================================================
-        // 16. EVENT HANDLERS & HELPERS
-        // ============================================================
-        function handleAddToCart(productId, quantity = 1) {
-            let product = null;
-            if (String(productId).startsWith('sku-')) {
-                const parts = productId.split('-');
-                const skuIndex = parseInt(parts[1], 10);
-                product = getProceduralSKU(skuIndex);
-            } else {
-                product = BASE_PRODUCTS.find(p => p.id === productId);
-            }
-            if (!product) return;
-            dispatch({ type: ActionTypes.ADD_TO_CART, payload: { product, quantity } });
-            showToast(`Added "${product.name.slice(0, 24)}..." to Bag!`, 'success');
-        }
-
-        function handleRemoveItem(keyOrId) {
-            dispatch({ type: ActionTypes.REMOVE_FROM_CART, payload: { customKey: keyOrId, productId: keyOrId } });
-            showToast('Item removed from bag', 'info');
-        }
-
-        function handleUpdateQty(keyOrId, newQty) {
-            dispatch({ type: ActionTypes.UPDATE_QUANTITY, payload: { customKey: keyOrId, productId: keyOrId, quantity: newQty } });
-        }
-
-        function clearCartConfirm() {
-            if (confirm('Clear all items from your shopping bag?')) {
-                dispatch({ type: ActionTypes.CLEAR_CART });
-                showToast('Shopping bag cleared', 'warning');
-            }
-        }
-
-        function handleApplyCoupon() {
-            const input = document.getElementById('couponCodeInput');
-            if (!input) return;
-            const code = input.value.trim().toUpperCase();
-            if (COUPON_REGISTRY[code]) {
-                dispatch({ type: ActionTypes.APPLY_COUPON, payload: { coupon: COUPON_REGISTRY[code] } });
-                showToast(`🎉 Coupon ${code} applied! Saved ${COUPON_REGISTRY[code].discountPercent}% OFF`, 'success');
-            } else {
-                showToast(`Invalid coupon "${code}". Try FESTIVE20 or WELCOME10!`, 'error');
-            }
-        }
-
-        function applyCouponDirectly(code) {
-            if (COUPON_REGISTRY[code]) {
-                dispatch({ type: ActionTypes.APPLY_COUPON, payload: { coupon: COUPON_REGISTRY[code] } });
-                showToast(`🎉 Coupon ${code} applied (${COUPON_REGISTRY[code].discountPercent}% OFF)!`, 'success');
-                if (state.currentRoute !== 'cart') navigateTo('cart');
-            }
-        }
-
-        function filterByCategory(category) {
-            dispatch({ type: ActionTypes.SET_CATEGORY, payload: { category } });
-            
-            // Highlight chip in strip
-            const chips = document.querySelectorAll('.cat-chip');
-            chips.forEach(chip => {
-                if (chip.innerText.includes(category) || (category === 'All' && chip.innerText.includes('All'))) {
-                    chip.classList.add('active');
-                } else {
-                    chip.classList.remove('active');
-                }
-            });
-
-            if (state.currentRoute !== 'products' && state.currentRoute !== 'home') navigateTo('products');
-        }
-
-        function handleSortChange(sort) {
-            dispatch({ type: ActionTypes.SET_SORT, payload: { sort } });
-        }
-
-        function handlePageChange(newPage) {
-            if (newPage < 1) return;
-            dispatch({ type: ActionTypes.SET_PAGE, payload: { page: newPage } });
-            window.scrollTo({ top: 300, behavior: 'smooth' });
-        }
-
-        function executeSearch() {
-            const input = document.getElementById('headerSearchInput');
-            if (!input) return;
-            dispatch({ type: ActionTypes.SET_SEARCH, payload: { query: input.value.trim() } });
-            if (state.currentRoute !== 'products') navigateTo('products');
         }
 
         function closeModal(modalId) {
@@ -5351,91 +5626,27 @@
             if (modal) modal.classList.remove('open');
         }
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const text = document.getElementById('toastText');
-            const icon = document.getElementById('toastIcon');
-            if (!toast || !text || !icon) return;
-
-            text.innerText = message;
-            if (type === 'success') {
-                icon.className = 'fa-solid fa-circle-check text-success';
-            } else if (type === 'warning') {
-                icon.className = 'fa-solid fa-triangle-exclamation text-warning';
-            } else if (type === 'error') {
-                icon.className = 'fa-solid fa-circle-xmark text-danger';
-            } else {
-                icon.className = 'fa-solid fa-circle-info text-info';
+        // ============================================================
+        // 19. FAIL-SAFE INITIALIZATION & EVENT LISTENERS
+        // ============================================================
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('open');
             }
-
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
-        }
-
-        // ============================================================
-        // 17. CONFETTI CELEBRATION ENGINE
-        // ============================================================
-        function triggerConfetti() {
-            const canvas = document.getElementById('confettiCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const particles = [];
-            const colors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#38bdf8', '#fbbf24'];
-
-            for (let i = 0; i < 150; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * -canvas.height,
-                    size: Math.random() * 8 + 4,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    speedY: Math.random() * 4 + 2,
-                    speedX: Math.random() * 3 - 1.5,
-                    rotation: Math.random() * 360,
-                    rotationSpeed: Math.random() * 10 - 5
-                });
-            }
-
-            let animationFrame;
-            let start = Date.now();
-
-            function updateConfetti() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    p.y += p.speedY;
-                    p.x += p.speedX;
-                    p.rotation += p.rotationSpeed;
-
-                    ctx.save();
-                    ctx.translate(p.x, p.y);
-                    ctx.rotate((p.rotation * Math.PI) / 180);
-                    ctx.fillStyle = p.color;
-                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-                    ctx.restore();
-                });
-
-                if (Date.now() - start < 4000) {
-                    animationFrame = requestAnimationFrame(updateConfetti);
-                } else {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    cancelAnimationFrame(animationFrame);
-                }
-            }
-
-            updateConfetti();
-        }
-
-        // ============================================================
-        // 18. INITIALIZATION
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', () => {
-            initFitverseDefaults();
-            renderApp();
-            updateHeaderBadges();
-            console.log('BharatCart Next-Gen Platform initialized for Swapnaneel Naskar.');
         });
+
+        function initializePlatform() {
+            if (typeof initFitverseDefaults === 'function') initFitverseDefaults();
+            updateHeaderBadges();
+            renderApp();
+            console.log('BharatCart Platform initialized successfully.');
+        }
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(initializePlatform, 10);
+        } else {
+            document.addEventListener('DOMContentLoaded', initializePlatform);
+        }
     </script>
 </body>
 </html>
