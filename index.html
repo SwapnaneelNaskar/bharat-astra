@@ -1573,11 +1573,6 @@
                         <i class="fa-solid fa-headset text-primary"></i> <span>24x7 Support</span>
                     </button>
 
-                    <!-- HIGH-CONTRAST AMBER-GOLD GST BUTTON (NEVER WHITE!) -->
-                    <button class="btn-gst-amber" id="navGstBtn" onclick="openGstModal()">
-                        <i class="fa-solid fa-calculator"></i> GST Calculation
-                    </button>
-
                     <!-- Cart Button -->
                     <button class="nav-btn" id="navCartBtn" onclick="navigateTo('cart')" style="position:relative;">
                         <i class="fa-solid fa-basket-shopping"></i>
@@ -1679,7 +1674,7 @@
                     18% GST (CGST 9% + SGST 9%)<br />
                     256-Bit SSL Encrypted Payment Gateway
                 </p>
-                <button class="btn-gst-amber btn-sm" onclick="openGstModal()">
+                <button class="btn-gst-amber btn-sm" id="footerGstRulesBtn" onclick="openGstModal()" title="View Statutory 18% GST Rules & Real-time Calculation">
                     <i class="fa-solid fa-calculator"></i> View GST Tax Rules
                 </button>
             </div>
@@ -1697,13 +1692,13 @@
 
     <!-- ==================== MODALS ==================== -->
 
-    <!-- 1. GST CALCULATION MODAL (useReducer Control) -->
+    <!-- 1. GST CALCULATION & STATUTORY TAX RULES MODAL -->
     <div id="gstCalculationModal" class="modal-overlay">
-        <div class="modal-content-card" style="max-width:680px;">
-            <div class="modal-header" style="background:#f8fafc;">
+        <div class="modal-content-card" style="max-width:760px;max-height:90vh;overflow-y:auto;">
+            <div class="modal-header" style="background:#f8fafc;position:sticky;top:0;z-index:10;">
                 <div style="display:flex;align-items:center;gap:0.6rem;">
                     <i class="fa-solid fa-calculator text-warning" style="font-size:1.3rem;"></i>
-                    <h3 style="font-size:1.2rem;font-weight:800;color:var(--secondary);margin:0;">GST Calculation Engine (18% Total)</h3>
+                    <h3 style="font-size:1.2rem;font-weight:800;color:var(--secondary);margin:0;">GST Tax Rules & Calculation Engine (18% Total)</h3>
                 </div>
                 <button class="modal-close-btn" onclick="closeModal('gstCalculationModal')">&times;</button>
             </div>
@@ -2209,6 +2204,10 @@
             state = cartReducer(state, action);
             updateHeaderBadges();
             renderApp();
+            const gstModal = document.getElementById('gstCalculationModal');
+            if (gstModal && gstModal.classList.contains('open') && typeof window.renderGstModalContent === 'function') {
+                window.renderGstModalContent();
+            }
         }
         window.dispatch = dispatch;
 
@@ -2465,6 +2464,182 @@
             if (modal) modal.classList.remove('open');
         }
         window.closeModal = closeModal;
+
+        // ============================================================
+        // 5B. STATUTORY GST RULES & CALCULATION ENGINE MODAL
+        // ============================================================
+        function openGstModal() {
+            renderGstModalContent();
+            openModal('gstCalculationModal');
+        }
+        window.openGstModal = openGstModal;
+
+        function renderGstModalContent() {
+            const body = document.getElementById('gstModalBody');
+            if (!body) return;
+
+            const calc = calculateCartFinancials(state.cart, state.appliedCoupon, state.gstRate);
+            const hasItems = state.cart && state.cart.length > 0;
+
+            // Standard demonstration values if cart is empty
+            const demoSubtotal = 10000;
+            const demoDiscount = 2000;
+            const demoTaxable = 8000;
+            const demoCgst = 720;
+            const demoSgst = 720;
+            const demoTotalGst = 1440;
+            const demoGrandTotal = 9440;
+
+            const activeSubtotal = hasItems ? calc.subtotal : demoSubtotal;
+            const activeDiscount = hasItems ? calc.discountAmount : demoDiscount;
+            const activeTaxable = hasItems ? calc.taxableSubtotal : demoTaxable;
+            const activeCgst = hasItems ? calc.cgstAmount : demoCgst;
+            const activeSgst = hasItems ? calc.sgstAmount : demoSgst;
+            const activeGstTotal = hasItems ? (calc.totalGst || calc.gstAmount) : demoTotalGst;
+            const activeGrandTotal = hasItems ? (calc.grandTotal || calc.finalTotal) : demoGrandTotal;
+            const activeDelivery = hasItems ? (calc.deliveryFee === 0 ? 'FREE' : formatINR(calc.deliveryFee)) : 'FREE';
+
+            body.innerHTML = `
+                <div style="background:#f8fafc;padding:1.25rem;border-radius:var(--radius-md);border:1px solid var(--border);margin-bottom:1.5rem;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <span style="background:var(--primary);color:white;font-size:0.75rem;font-weight:800;padding:0.25rem 0.6rem;border-radius:6px;letter-spacing:0.5px;">
+                                STATUTORY GST COMPLIANCE
+                            </span>
+                            <span style="background:#ecfdf5;color:#065f46;font-size:0.78rem;font-weight:700;padding:0.25rem 0.65rem;border-radius:999px;">
+                                Unified 18% GST (CGST 9% + SGST 9%)
+                            </span>
+                        </div>
+                        <span style="font-size:0.8rem;color:var(--text-muted);font-weight:600;">
+                            GSTIN: <strong style="color:var(--secondary);">29AABCU9603R1ZM</strong>
+                        </span>
+                    </div>
+
+                    <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;margin:0;">
+                        Bharat Astra adheres to Section 31 (Tax Invoices) & Section 34 (Credit Notes) of the Central Goods & Services Tax (CGST) Act, 2017. All customer orders receive official e-Way bill compliant tax invoices with full Input Tax Credit (ITC) eligibility.
+                    </p>
+                </div>
+
+                <!-- LIVE CART COMPUTATION MATRIX -->
+                <div style="margin-bottom:1.5rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;flex-wrap:wrap;gap:0.5rem;">
+                        <h4 style="font-size:1rem;font-weight:800;color:var(--secondary);margin:0;display:flex;align-items:center;gap:0.5rem;">
+                            <i class="fa-solid fa-receipt text-primary"></i> ${hasItems ? `Live Computation for Your Cart (${calc.totalItemCount} Items)` : 'Live Computation Breakdown Engine (Benchmark Example)'}
+                        </h4>
+                        ${!hasItems ? '<span style="font-size:0.75rem;background:#fef3c7;color:#92400e;padding:0.2rem 0.5rem;border-radius:4px;font-weight:700;">Cart is empty - showing ₹10,000 benchmark</span>' : '<span style="font-size:0.75rem;background:#ecfdf5;color:#065f46;padding:0.2rem 0.5rem;border-radius:4px;font-weight:700;">Live Cart Active</span>'}
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.85rem;">
+                        <div style="background:white;padding:1rem;border-radius:8px;border:1px solid var(--border);">
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;">1. Raw Cart Subtotal</div>
+                            <div style="font-size:1.35rem;font-weight:800;color:var(--secondary);margin-top:0.25rem;">${formatINR(activeSubtotal)}</div>
+                            <div style="font-size:0.75rem;color:#64748b;">${hasItems ? `${calc.totalItemCount} items in cart` : 'Standard benchmark order'}</div>
+                        </div>
+
+                        <div style="background:white;padding:1rem;border-radius:8px;border:1px solid var(--border);">
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;">2. Coupon Deduction</div>
+                            <div style="font-size:1.35rem;font-weight:800;color:var(--success);margin-top:0.25rem;">- ${formatINR(activeDiscount)}</div>
+                            <div style="font-size:0.75rem;color:#059669;">${hasItems ? (calc.discountPercent > 0 ? `${calc.discountPercent}% OFF coupon applied` : 'No coupon applied') : '20% OFF festive coupon'}</div>
+                        </div>
+
+                        <div style="background:white;padding:1rem;border-radius:8px;border:1px solid var(--border);">
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;">3. Taxable Subtotal</div>
+                            <div style="font-size:1.35rem;font-weight:800;color:var(--secondary);margin-top:0.25rem;">${formatINR(activeTaxable)}</div>
+                            <div style="font-size:0.75rem;color:#64748b;">Subtotal - Discount</div>
+                        </div>
+
+                        <div style="background:white;padding:1rem;border-radius:8px;border:1px solid var(--border);">
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;">4. CGST (9.0%)</div>
+                            <div style="font-size:1.35rem;font-weight:800;color:var(--primary);margin-top:0.25rem;">${formatINR(activeCgst)}</div>
+                            <div style="font-size:0.75rem;color:#64748b;">Taxable Base &times; 0.09</div>
+                        </div>
+
+                        <div style="background:white;padding:1rem;border-radius:8px;border:1px solid var(--border);">
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;">5. SGST (9.0%)</div>
+                            <div style="font-size:1.35rem;font-weight:800;color:var(--primary);margin-top:0.25rem;">${formatINR(activeSgst)}</div>
+                            <div style="font-size:0.75rem;color:#64748b;">Taxable Base &times; 0.09</div>
+                        </div>
+
+                        <div style="background:white;padding:1rem;border-radius:8px;border:1px solid var(--primary);border-top:3px solid var(--primary);box-shadow:0 2px 8px rgba(37,99,235,0.08);">
+                            <div style="font-size:0.75rem;color:var(--primary);font-weight:800;text-transform:uppercase;">6. Net Payable (INR)</div>
+                            <div style="font-size:1.45rem;font-weight:800;color:var(--primary);margin-top:0.25rem;">${formatINR(activeGrandTotal)}</div>
+                            <div style="font-size:0.75rem;color:#64748b;">Delivery: ${activeDelivery}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP-BY-STEP MATHEMATICAL FORMULATION -->
+                <div style="background:#0f172a;color:#f8fafc;padding:1.25rem;border-radius:8px;font-family:'JetBrains Mono', Consolas, monospace;font-size:0.83rem;line-height:1.8;margin-bottom:1.5rem;">
+                    <div style="color:#38bdf8;font-weight:700;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem;">
+                        <i class="fa-solid fa-code"></i> STATUTORY GST CALCULATION FORMULA (CGST ACT 2017):
+                    </div>
+                    <div>1. Gross Subtotal          = &sum; (Item Price &times; Quantity)           = <strong>${formatINR(activeSubtotal)}</strong></div>
+                    <div>2. Coupon Deduction        = Gross Subtotal &times; (Discount % / 100)      = <strong>${formatINR(activeDiscount)}</strong></div>
+                    <div>3. Taxable Subtotal        = Gross Subtotal - Coupon Deduction     = <strong>${formatINR(activeTaxable)}</strong></div>
+                    <div>4. Central GST (CGST @ 9%) = Taxable Subtotal &times; 0.09                   = <strong>${formatINR(activeCgst)}</strong></div>
+                    <div>5. State GST (SGST @ 9%)   = Taxable Subtotal &times; 0.09                   = <strong>${formatINR(activeSgst)}</strong></div>
+                    <div>6. Total Statutory GST     = CGST (9%) + SGST (9%) (18% Total)     = <strong>${formatINR(activeGstTotal)}</strong></div>
+                    <div>7. Logistics Delivery Fee  = ${hasItems ? (calc.deliveryFee === 0 ? 'FREE (Eligible threshold)' : formatINR(calc.deliveryFee)) : 'FREE'}</div>
+                    <div style="color:#4ade80;font-weight:700;margin-top:0.4rem;padding-top:0.4rem;border-top:1px dashed #334155;">
+                        8. Net Grand Total Payable  = Taxable Subtotal + Total GST + Delivery = ${formatINR(activeGrandTotal)}
+                    </div>
+                </div>
+
+                <!-- STATUTORY GST TAX RULES DIRECTORY ACROSS ALL VERTICALS -->
+                <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.5rem;">
+                    <div style="background:#f1f5f9;padding:0.75rem 1rem;font-weight:800;font-size:0.9rem;color:var(--secondary);display:flex;align-items:center;gap:0.5rem;">
+                        <i class="fa-solid fa-scale-balanced text-primary"></i> Statutory GST Rates & Rules Across Bharat Astra Verticals
+                    </div>
+                    <div style="padding:1rem;background:white;display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:1rem;font-size:0.83rem;line-height:1.6;">
+                        <div style="border-left:3px solid #2563eb;padding-left:0.75rem;">
+                            <strong style="color:var(--secondary);">Retail Products & Electronics (18% GST)</strong>
+                            <p style="color:var(--text-muted);margin:0.25rem 0 0;">HSN 8471/8517. Standard unified 18% GST rate applicable to laptops, mobiles, audio, wearables & appliances with registered ITC.</p>
+                        </div>
+                        <div style="border-left:3px solid #059669;padding-left:0.75rem;">
+                            <strong style="color:var(--secondary);">Fashion & Apparel (18% Standard)</strong>
+                            <p style="color:var(--text-muted);margin:0.25rem 0 0;">HSN 6105/6203. Standard 18% GST applicable to all designer blazers, festive kurtas, ethnic sarees, sneakers and formal footwear.</p>
+                        </div>
+                        <div style="border-left:3px solid #d97706;padding-left:0.75rem;">
+                            <strong style="color:var(--secondary);">Blockbuster Movies & Cinema (18% GST)</strong>
+                            <p style="color:var(--text-muted);margin:0.25rem 0 0;">SAC 9996. Applicable on movie tickets across 305+ theaters in 20 cities (PVR-INOX, Cinepolis, etc.) with verified entertainment tax compliance.</p>
+                        </div>
+                        <div style="border-left:3px solid #7c3aed;padding-left:0.75rem;">
+                            <strong style="color:var(--secondary);">Flights & Aviation Services (5% - 12%)</strong>
+                            <p style="color:var(--text-muted);margin:0.25rem 0 0;">SAC 9964. Economy Class passenger services attract 5% GST; Business & First Class Suites attract 12% GST with complete corporate ITC credit.</p>
+                        </div>
+                        <div style="border-left:3px solid #dc2626;padding-left:0.75rem;">
+                            <strong style="color:var(--secondary);">Indian Railways Resv. (5% AC GST)</strong>
+                            <p style="color:var(--text-muted);margin:0.25rem 0 0;">SAC 9965. Statutory 5% GST on AC travel (1A, 2A, 3A, CC, EC) included in IRCTC passenger fares across all 18 railway zones.</p>
+                        </div>
+                        <div style="border-left:3px solid #0891b2;padding-left:0.75rem;">
+                            <strong style="color:var(--secondary);">Hotel Stays & Stays (12% - 18% Slab)</strong>
+                            <p style="color:var(--text-muted);margin:0.25rem 0 0;">SAC 9963. Rooms under ₹7,500/night attract 12% GST; Presidential & premium suites above ₹7,500/night attract 18% GST.</p>
+                        </div>
+                    </div>
+                    <div style="background:#eff6ff;padding:0.75rem 1rem;border-top:1px solid #bfdbfe;font-size:0.8rem;color:#1e40af;display:flex;align-items:center;gap:0.5rem;">
+                        <i class="fa-solid fa-shield-check text-primary"></i>
+                        <span><strong>10-Day Return & Section 34 Guarantee:</strong> On return approval, an official GST Credit Note is issued and 100% of GST paid is refunded immediately.</span>
+                    </div>
+                </div>
+
+                <!-- ACTION FOOTER -->
+                <div style="display:flex;justify-content:flex-end;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+                    <button class="btn btn-outline" onclick="closeModal('gstCalculationModal')">
+                        <i class="fa-solid fa-xmark"></i> Close Rules
+                    </button>
+                    ${hasItems ? `
+                        <button class="btn btn-primary" onclick="closeModal('gstCalculationModal'); navigateTo('cart');">
+                            <i class="fa-solid fa-basket-shopping"></i> View Cart & Checkout (${formatINR(calc.grandTotal)})
+                        </button>
+                    ` : `
+                        <button class="btn btn-primary" onclick="closeModal('gstCalculationModal'); navigateTo('products');">
+                            <i class="fa-solid fa-bag-shopping"></i> Browse Catalog Products
+                        </button>
+                    `}
+                </div>
+            `;
+        }
+        window.renderGstModalContent = renderGstModalContent;
 
         let activeAuthTab = 'login'; // 'login' | 'register' | 'profile'
 
