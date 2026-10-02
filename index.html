@@ -122,13 +122,14 @@
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
         }
         .nav-container {
-            max-width: 1460px;
+            max-width: 1720px;
+            width: 100%;
             margin: 0 auto;
-            padding: 0.75rem 1.5rem;
+            padding: 0.65rem 1.25rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 1.5rem;
+            gap: 1rem;
         }
         .nav-brand {
             display: flex;
@@ -140,6 +141,7 @@
             font-size: 1.35rem;
             letter-spacing: -0.5px;
             cursor: pointer;
+            flex-shrink: 0;
         }
         .nav-brand-icon {
             width: 38px;
@@ -151,12 +153,14 @@
             justify-content: center;
             color: white;
             box-shadow: 0 4px 12px var(--primary-glow);
+            flex-shrink: 0;
         }
 
         .search-bar-wrapper {
-            flex: 1;
-            max-width: 520px;
+            flex: 0 1 340px;
+            min-width: 150px;
             position: relative;
+            flex-shrink: 1;
         }
         .search-input {
             width: 100%;
@@ -185,11 +189,79 @@
             pointer-events: none;
         }
 
+        /* HORIZONTALLY SCROLLABLE NAV ACTIONS WRAPPER */
+        .nav-actions-wrapper {
+            display: flex;
+            align-items: center;
+            position: relative;
+            flex: 1;
+            min-width: 0;
+            gap: 0.35rem;
+        }
+
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.65rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            scrollbar-color: #f59e0b rgba(255, 255, 255, 0.08);
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            padding: 0.25rem 0.25rem 0.5rem 0.25rem;
+            flex: 1;
+            min-width: 0;
         }
+
+        /* High-visibility gradient custom scrollbar */
+        .nav-actions::-webkit-scrollbar {
+            height: 5px;
+        }
+        .nav-actions::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
+            margin: 0 4px;
+        }
+        .nav-actions::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #6366f1, #a855f7, #f59e0b);
+            border-radius: 999px;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+        }
+        .nav-actions::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #4f46e5, #9333ea, #d97706);
+        }
+
+        .nav-scroll-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: var(--transition-fast);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+            z-index: 2;
+            padding: 0;
+            font-size: 0.78rem;
+        }
+        .nav-scroll-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary-light);
+            color: white;
+            transform: scale(1.08);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
+        }
+        .nav-scroll-btn:active {
+            transform: scale(0.95);
+        }
+
         .nav-btn {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.14);
@@ -204,6 +276,8 @@
             gap: 0.45rem;
             transition: var(--transition-fast);
             text-decoration: none;
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
         }
         .nav-btn:hover {
             background: rgba(255, 255, 255, 0.1);
@@ -231,6 +305,8 @@
             gap: 0.45rem;
             cursor: pointer;
             transition: var(--transition-fast);
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
         }
         .btn-gst-amber:hover {
             background: linear-gradient(135deg, #fbbf24, #b45309) !important;
@@ -1021,6 +1097,8 @@
             box-shadow: 0 2px 10px rgba(250, 204, 21, 0.25);
             cursor: pointer;
             transition: var(--transition-fast);
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
         }
         .wallet-badge:hover {
             transform: scale(1.03);
@@ -1462,57 +1540,67 @@
                        onkeyup="if(event.key==='Enter') executeSearch()" />
             </div>
 
-            <!-- Navigation Links -->
-            <div class="nav-actions">
-                <button class="nav-btn" id="navHomeBtn" onclick="navigateTo('home')">
-                    <i class="fa-solid fa-house"></i> Home
-                </button>
-                <button class="nav-btn" id="navProductsBtn" onclick="navigateTo('products')">
-                    <i class="fa-solid fa-layer-group"></i> Catalog
-                </button>
-                <button class="nav-btn" id="navMoviesBtn" onclick="navigateTo('bookings'); setBookingVertical('movies');">
-                    <i class="fa-solid fa-clapperboard text-warning"></i> Movies (Now Showing)
-                </button>
-                <button class="nav-btn" id="navBookingsBtn" onclick="navigateTo('bookings')">
-                    <i class="fa-solid fa-ticket text-info"></i> All Bookings
-                </button>
-                <button class="nav-btn" id="navTheatersBtn" onclick="navigateTo('bookings'); setBookingVertical('cinema'); bookingState.moviesSubView='theaters';" title="Nationwide Multiplex Directory">
-                    <i class="fa-solid fa-film text-primary"></i> Theaters (305+)
-                </button>
-                <button class="nav-btn" id="navReturnsBtn" onclick="navigateTo('orders'); if(window.setOrdersSubTab) window.setOrdersSubTab('returns');" title="10-Day Easy Returns & Refunds">
-                    <i class="fa-solid fa-rotate-left text-success"></i> Returns & Refunds
-                </button>
-                <button class="nav-btn" id="navCompareBtn" onclick="openCompareModal()">
-                    <i class="fa-solid fa-code-compare"></i> Compare <span id="navCompareCount" style="font-size:0.75rem;opacity:0.8;">(0)</span>
+            <!-- Navigation Links (Horizontally Scrollable with Quick Chevrons) -->
+            <div class="nav-actions-wrapper">
+                <button type="button" class="nav-scroll-btn nav-scroll-left" id="navScrollLeftBtn" onclick="scrollNavActions(-220)" aria-label="Scroll navigation left" title="Scroll tabs left">
+                    <i class="fa-solid fa-chevron-left"></i>
                 </button>
 
-                <button class="nav-btn" id="navContactBtn" onclick="openContactSupportModal()" title="24x7 Customer Care & Helpline Directory">
-                    <i class="fa-solid fa-headset text-primary"></i> <span>24x7 Support</span>
-                </button>
+                <div class="nav-actions" id="mainNavActions">
+                    <button class="nav-btn" id="navHomeBtn" onclick="navigateTo('home')">
+                        <i class="fa-solid fa-house"></i> Home
+                    </button>
+                    <button class="nav-btn" id="navProductsBtn" onclick="navigateTo('products')">
+                        <i class="fa-solid fa-layer-group"></i> Catalog
+                    </button>
+                    <button class="nav-btn" id="navMoviesBtn" onclick="navigateTo('bookings'); setBookingVertical('movies');">
+                        <i class="fa-solid fa-clapperboard text-warning"></i> Movies (Now Showing)
+                    </button>
+                    <button class="nav-btn" id="navBookingsBtn" onclick="navigateTo('bookings')">
+                        <i class="fa-solid fa-ticket text-info"></i> All Bookings
+                    </button>
+                    <button class="nav-btn" id="navTheatersBtn" onclick="navigateTo('bookings'); setBookingVertical('cinema'); bookingState.moviesSubView='theaters';" title="Nationwide Multiplex Directory">
+                        <i class="fa-solid fa-film text-primary"></i> Theaters (305+)
+                    </button>
+                    <button class="nav-btn" id="navReturnsBtn" onclick="navigateTo('orders'); if(window.setOrdersSubTab) window.setOrdersSubTab('returns');" title="10-Day Easy Returns & Refunds">
+                        <i class="fa-solid fa-rotate-left text-success"></i> Returns & Refunds
+                    </button>
+                    <button class="nav-btn" id="navCompareBtn" onclick="openCompareModal()">
+                        <i class="fa-solid fa-code-compare"></i> Compare <span id="navCompareCount" style="font-size:0.75rem;opacity:0.8;">(0)</span>
+                    </button>
 
-                <!-- HIGH-CONTRAST AMBER-GOLD GST BUTTON (NEVER WHITE!) -->
-                <button class="btn-gst-amber" id="navGstBtn" onclick="openGstModal()">
-                    <i class="fa-solid fa-calculator"></i> GST Calculation
-                </button>
+                    <button class="nav-btn" id="navContactBtn" onclick="openContactSupportModal()" title="24x7 Customer Care & Helpline Directory">
+                        <i class="fa-solid fa-headset text-primary"></i> <span>24x7 Support</span>
+                    </button>
 
-                <!-- Cart Button -->
-                <button class="nav-btn" id="navCartBtn" onclick="navigateTo('cart')" style="position:relative;">
-                    <i class="fa-solid fa-basket-shopping"></i>
-                    <span>Cart</span>
-                    <span id="navCartCount" class="cart-badge">0</span>
-                </button>
+                    <!-- HIGH-CONTRAST AMBER-GOLD GST BUTTON (NEVER WHITE!) -->
+                    <button class="btn-gst-amber" id="navGstBtn" onclick="openGstModal()">
+                        <i class="fa-solid fa-calculator"></i> GST Calculation
+                    </button>
 
-                <!-- VIP DEMO TREASURY (Only visible for Owner) -->
-                <div class="wallet-badge" id="navWalletBadge" onclick="openAuthModal()" style="display:none;" title="VIP Treasury">
-                    <i class="fa-solid fa-vault text-warning"></i>
-                    <span>VIP Treasury:</span>
-                    <strong id="navWalletDisplay" style="color:#fde047;">₹7.00 Cr</strong>
+                    <!-- Cart Button -->
+                    <button class="nav-btn" id="navCartBtn" onclick="navigateTo('cart')" style="position:relative;">
+                        <i class="fa-solid fa-basket-shopping"></i>
+                        <span>Cart</span>
+                        <span id="navCartCount" class="cart-badge">0</span>
+                    </button>
+
+                    <!-- VIP DEMO TREASURY (Only visible for Owner) -->
+                    <div class="wallet-badge" id="navWalletBadge" onclick="openAuthModal()" style="display:none;" title="VIP Treasury">
+                        <i class="fa-solid fa-vault text-warning"></i>
+                        <span>VIP Treasury:</span>
+                        <strong id="navWalletDisplay" style="color:#fde047;">₹7.00 Cr</strong>
+                    </div>
+
+                    <!-- User Account / Login Button -->
+                    <button class="nav-btn" id="navUserBtn" onclick="openAuthModal()" title="Account & Login System">
+                        <i class="fa-solid fa-circle-user text-warning"></i>
+                        <span id="navUserNameDisplay" style="font-weight:700;">Sign In / Account</span>
+                    </button>
                 </div>
 
-                <!-- User Account / Login Button -->
-                <button class="nav-btn" id="navUserBtn" onclick="openAuthModal()" title="Account & Login System">
-                    <i class="fa-solid fa-circle-user text-warning"></i>
-                    <span id="navUserNameDisplay" style="font-weight:700;">Sign In / Account</span>
+                <button type="button" class="nav-scroll-btn nav-scroll-right" id="navScrollRightBtn" onclick="scrollNavActions(220)" aria-label="Scroll navigation right" title="Scroll tabs right">
+                    <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
         </div>
@@ -3583,10 +3671,70 @@
             });
         }
 
+        // ============================================================
+        // HORIZONTALLY SCROLLABLE NAVBAR CONTROLS
+        // ============================================================
+        function scrollNavActions(offset) {
+            const el = document.getElementById('mainNavActions') || document.querySelector('.nav-actions');
+            if (el) {
+                el.scrollBy({ left: offset, behavior: 'smooth' });
+                setTimeout(updateNavScrollIndicators, 180);
+            }
+        }
+        window.scrollNavActions = scrollNavActions;
+
+        function updateNavScrollIndicators() {
+            const el = document.getElementById('mainNavActions') || document.querySelector('.nav-actions');
+            const leftBtn = document.getElementById('navScrollLeftBtn');
+            const rightBtn = document.getElementById('navScrollRightBtn');
+            if (!el) return;
+
+            const hasOverflow = el.scrollWidth > el.clientWidth + 5;
+            if (!hasOverflow) {
+                if (leftBtn) leftBtn.style.display = 'none';
+                if (rightBtn) rightBtn.style.display = 'none';
+                return;
+            }
+
+            if (leftBtn) {
+                leftBtn.style.display = 'flex';
+                const canLeft = el.scrollLeft > 6;
+                leftBtn.style.opacity = canLeft ? '1' : '0.35';
+                leftBtn.style.pointerEvents = canLeft ? 'auto' : 'none';
+            }
+
+            if (rightBtn) {
+                rightBtn.style.display = 'flex';
+                const atEnd = el.scrollLeft >= (el.scrollWidth - el.clientWidth - 6);
+                rightBtn.style.opacity = atEnd ? '0.35' : '1';
+                rightBtn.style.pointerEvents = atEnd ? 'none' : 'auto';
+            }
+        }
+        window.updateNavScrollIndicators = updateNavScrollIndicators;
+
+        function initNavScrollListeners() {
+            const navActionsEl = document.getElementById('mainNavActions') || document.querySelector('.nav-actions');
+            if (!navActionsEl) return;
+
+            navActionsEl.addEventListener('wheel', function(e) {
+                if (e.deltaY !== 0) {
+                    e.preventDefault();
+                    navActionsEl.scrollLeft += e.deltaY;
+                    updateNavScrollIndicators();
+                }
+            }, { passive: false });
+
+            navActionsEl.addEventListener('scroll', updateNavScrollIndicators);
+            window.addEventListener('resize', updateNavScrollIndicators);
+            setTimeout(updateNavScrollIndicators, 200);
+        }
+        window.initNavScrollListeners = initNavScrollListeners;
+
         // Initial App Setup
         window.addEventListener('DOMContentLoaded', function() {
             updateHeaderBadges();
             renderApp();
+            initNavScrollListeners();
             
             // Initial Visit Auth Prompt with Skip Option
             if (!state.currentUser.isLoggedIn && !sessionStorage.getItem('guestAuthSkipped')) {
