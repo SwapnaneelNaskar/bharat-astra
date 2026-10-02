@@ -3828,27 +3828,27 @@
             movieLanguageFilter: 'All',
             movieGenreFilter: 'All',
 
-            // FLIGHTS
-            flightFrom: 'DEL - New Delhi (DEL)',
-            flightTo: 'LHR - London Heathrow (LHR)',
+            // FLIGHTS (NATIONAL & INTERNATIONAL COMPREHENSIVE DIRECTORY)
+            flightFrom: 'Kolkata (CCU)',
+            flightTo: 'London Heathrow (LHR)',
             flightDate: '2026-10-15',
-            flightAirline: 'Emirates',
-            flightNumber: 'EK-511',
-            flightTime: '04:15 AM - 08:30 AM (Non-Stop)',
+            flightAirline: 'British Airways',
+            flightNumber: 'BA-118',
+            flightTime: '07:15 AM - 01:45 PM (Direct)',
             flightClass: 'Economy',
-            flightBasePrice: 42500,
+            flightBasePrice: 62500,
             flightAdults: 2,
             flightChildren: 0,
             selectedFlightSeats: ['12A', '12B'],
 
-            // TRAINS (INDIAN RAILWAY)
-            trainFrom: 'NDLS - New Delhi',
-            trainTo: 'HWH - Howrah / Kolkata',
-            trainName: '12301 Indian Railway: New Delhi - Howrah Rajdhani Express',
-            trainClass: '3rd AC Sleeper (3A)',
+            // TRAINS (INDIAN RAILWAY NATIONWIDE CORRIDORS)
+            trainFrom: 'New Delhi (NDLS)',
+            trainTo: 'Howrah Jn (HWH)',
+            trainName: 'Rajdhani Express (12301)',
+            trainClass: 'AC 3 Tier (3A)',
             trainDate: '2026-10-12',
             trainBerthPreference: 'Lower Berth (LB)',
-            trainBasePrice: 2450,
+            trainBasePrice: 2850,
             trainPassengers: 2,
             selectedTrainSeats: ['B4-12 (LB)', 'B4-15 (MB)'],
 
@@ -4785,200 +4785,269 @@
         }
         window.getTrainCoachAndLayout = getTrainCoachAndLayout;
 
-        function renderTrainBookingHTML() {
-            let classMultiplier = 1.0;
-            if (bookingState.trainClass.includes('2A')) classMultiplier = 1.4;
-            else if (bookingState.trainClass.includes('1A') || bookingState.trainClass.includes('Executive')) classMultiplier = 2.0;
+        // ============================================================
+        // C. NATIONWIDE & WORLDWIDE AIRPORTS DIRECTORY (NATIONAL & INTERNATIONAL)
+        // ============================================================
+        const ALL_AIRPORTS = [
+            // Premier Domestic Gateways & Metro Hubs (India)
+            { code: 'DEL', name: 'Indira Gandhi International Airport', city: 'New Delhi', state: 'Delhi NCR', region: 'North' },
+            { code: 'BOM', name: 'Chhatrapati Shivaji Maharaj International', city: 'Mumbai', state: 'Maharashtra', region: 'West' },
+            { code: 'BLR', name: 'Kempegowda International Airport', city: 'Bengaluru', state: 'Karnataka', region: 'South' },
+            { code: 'CCU', name: 'Netaji Subhash Chandra Bose International', city: 'Kolkata', state: 'West Bengal', region: 'East' },
+            { code: 'HYD', name: 'Rajiv Gandhi International Airport', city: 'Hyderabad', state: 'Telangana', region: 'South' },
+            { code: 'MAA', name: 'Chennai International Airport', city: 'Chennai', state: 'Tamil Nadu', region: 'South' },
+            { code: 'AMD', name: 'Sardar Vallabhbhai Patel International', city: 'Ahmedabad', state: 'Gujarat', region: 'West' },
+            { code: 'COK', name: 'Cochin International Airport', city: 'Kochi', state: 'Kerala', region: 'South' },
+            { code: 'GOI', name: 'Dabolim Airport', city: 'Goa (Dabolim)', state: 'Goa', region: 'West' },
+            { code: 'GOX', name: 'Manohar International Airport', city: 'Goa (Mopa)', state: 'Goa', region: 'West' },
+            { code: 'PNQ', name: 'Pune International Airport', city: 'Pune', state: 'Maharashtra', region: 'West' },
+            { code: 'JAI', name: 'Jaipur International Airport', city: 'Jaipur', state: 'Rajasthan', region: 'North' },
+            { code: 'LKO', name: 'Chaudhary Charan Singh International', city: 'Lucknow', state: 'Uttar Pradesh', region: 'North' },
+            { code: 'GAU', name: 'Lokpriya Gopinath Bordoloi International', city: 'Guwahati', state: 'Assam', region: 'North-East' },
+            { code: 'IXC', name: 'Shaheed Bhagat Singh International Airport', city: 'Chandigarh', state: 'Punjab/Haryana', region: 'North' },
+            { code: 'TRV', name: 'Trivandrum International Airport', city: 'Thiruvananthapuram', state: 'Kerala', region: 'South' },
+            { code: 'ATQ', name: 'Sri Guru Ram Dass Jee International', city: 'Amritsar', state: 'Punjab', region: 'North' },
+            { code: 'VNS', name: 'Lal Bahadur Shastri International', city: 'Varanasi', state: 'Uttar Pradesh', region: 'North' },
+            { code: 'SXR', name: 'Sheikh ul-Alam International Airport', city: 'Srinagar', state: 'Jammu & Kashmir', region: 'North' },
+            { code: 'PAT', name: 'Jay Prakash Narayan Airport', city: 'Patna', state: 'Bihar', region: 'East' },
+            { code: 'BBI', name: 'Biju Patnaik International Airport', city: 'Bhubaneswar', state: 'Odisha', region: 'East' },
+            { code: 'IDR', name: 'Devi Ahilyabai Holkar Airport', city: 'Indore', state: 'Madhya Pradesh', region: 'Central' },
+            { code: 'CJB', name: 'Coimbatore International Airport', city: 'Coimbatore', state: 'Tamil Nadu', region: 'South' },
+            { code: 'IXE', name: 'Mangaluru International Airport', city: 'Mangaluru', state: 'Karnataka', region: 'South' },
+            { code: 'TRZ', name: 'Tiruchirappalli International Airport', city: 'Tiruchirappalli', state: 'Tamil Nadu', region: 'South' },
+            { code: 'IXB', name: 'Bagdogra International Airport', city: 'Bagdogra / Siliguri', state: 'West Bengal', region: 'East' },
+            { code: 'IXZ', name: 'Veer Savarkar International Airport', city: 'Port Blair (Andaman)', state: 'Andaman & Nicobar', region: 'Islands' },
+            { code: 'IXR', name: 'Birsa Munda Airport', city: 'Ranchi', state: 'Jharkhand', region: 'East' },
+            { code: 'RPR', name: 'Swami Vivekananda Airport', city: 'Raipur', state: 'Chhattisgarh', region: 'Central' },
+            { code: 'STV', name: 'Surat International Airport', city: 'Surat', state: 'Gujarat', region: 'West' },
+            { code: 'VTZ', name: 'Visakhapatnam International Airport', city: 'Visakhapatnam', state: 'Andhra Pradesh', region: 'South' },
+            { code: 'BDQ', name: 'Vadodara Airport', city: 'Vadodara', state: 'Gujarat', region: 'West' },
+            { code: 'IXM', name: 'Madurai Airport', city: 'Madurai', state: 'Tamil Nadu', region: 'South' },
+            { code: 'BHO', name: 'Raja Bhoj Airport', city: 'Bhopal', state: 'Madhya Pradesh', region: 'Central' },
+            { code: 'DED', name: 'Jolly Grant Airport', city: 'Dehradun', state: 'Uttarakhand', region: 'North' },
+            { code: 'UDR', name: 'Maharana Pratap Airport', city: 'Udaipur', state: 'Rajasthan', region: 'North' },
+            { code: 'JAT', name: 'Jammu Civil Enclave', city: 'Jammu', state: 'Jammu & Kashmir', region: 'North' },
+            { code: 'IMF', name: 'Bir Tikendrajit International Airport', city: 'Imphal', state: 'Manipur', region: 'North-East' },
+            { code: 'IXA', name: 'Maharaja Bir Bikram Airport', city: 'Agartala', state: 'Tripura', region: 'North-East' },
+            { code: 'AYJ', name: 'Maharishi Valmiki International Airport', city: 'Ayodhya', state: 'Uttar Pradesh', region: 'North' },
 
-            const unitFare = Math.round(bookingState.trainBasePrice * classMultiplier);
-            const totalPersons = (bookingState.trainAdults || 1) + (bookingState.trainChildren || 0);
-            const totalFare = bookingState.selectedTrainSeats.length * unitFare;
+            // Major International Gateways Directly Connected with India
+            { code: 'LHR', name: 'Heathrow Airport', city: 'London Heathrow (LHR)', country: 'United Kingdom', isIntl: true },
+            { code: 'LGW', name: 'Gatwick Airport', city: 'London Gatwick (LGW)', country: 'United Kingdom', isIntl: true },
+            { code: 'DXB', name: 'Dubai International Airport', city: 'Dubai (DXB)', country: 'United Arab Emirates', isIntl: true },
+            { code: 'SIN', name: 'Singapore Changi Airport', city: 'Singapore (SIN)', country: 'Singapore', isIntl: true },
+            { code: 'BKK', name: 'Suvarnabhumi Airport', city: 'Bangkok (BKK)', country: 'Thailand', isIntl: true },
+            { code: 'JFK', name: 'John F. Kennedy International', city: 'New York (JFK)', country: 'United States', isIntl: true },
+            { code: 'EWR', name: 'Newark Liberty International', city: 'Newark (EWR)', country: 'United States', isIntl: true },
+            { code: 'SFO', name: 'San Francisco International Airport', city: 'San Francisco (SFO)', country: 'United States', isIntl: true },
+            { code: 'ORD', name: 'O\'Hare International Airport', city: 'Chicago (ORD)', country: 'United States', isIntl: true },
+            { code: 'YYZ', name: 'Toronto Pearson International', city: 'Toronto (YYZ)', country: 'Canada', isIntl: true },
+            { code: 'CDG', name: 'Charles de Gaulle Airport', city: 'Paris (CDG)', country: 'France', isIntl: true },
+            { code: 'FRA', name: 'Frankfurt Airport', city: 'Frankfurt (FRA)', country: 'Germany', isIntl: true },
+            { code: 'AMS', name: 'Amsterdam Airport Schiphol', city: 'Amsterdam (AMS)', country: 'Netherlands', isIntl: true },
+            { code: 'ZRH', name: 'Zurich Airport', city: 'Zurich (ZRH)', country: 'Switzerland', isIntl: true },
+            { code: 'DOH', name: 'Hamad International Airport', city: 'Doha (DOH)', country: 'Qatar', isIntl: true },
+            { code: 'AUH', name: 'Zayed International Airport', city: 'Abu Dhabi (AUH)', country: 'United Arab Emirates', isIntl: true },
+            { code: 'HND', name: 'Haneda Airport', city: 'Tokyo (HND)', country: 'Japan', isIntl: true },
+            { code: 'SYD', name: 'Sydney Kingsford Smith Airport', city: 'Sydney (SYD)', country: 'Australia', isIntl: true },
+            { code: 'MEL', name: 'Melbourne Airport', city: 'Melbourne (MEL)', country: 'Australia', isIntl: true },
+            { code: 'KUL', name: 'Kuala Lumpur International', city: 'Kuala Lumpur (KUL)', country: 'Malaysia', isIntl: true },
+            { code: 'CMB', name: 'Bandaranaike International', city: 'Colombo (CMB)', country: 'Sri Lanka', isIntl: true },
+            { code: 'KTM', name: 'Tribhuvan International Airport', city: 'Kathmandu (KTM)', country: 'Nepal', isIntl: true },
+            { code: 'MLE', name: 'Velana International Airport', city: 'Male / Maldives (MLE)', country: 'Maldives', isIntl: true },
+            { code: 'DAC', name: 'Hazrat Shahjalal International', city: 'Dhaka (DAC)', country: 'Bangladesh', isIntl: true },
+            { code: 'MCT', name: 'Muscat International Airport', city: 'Muscat (MCT)', country: 'Oman', isIntl: true },
+            { code: 'JED', name: 'King Abdulaziz International', city: 'Jeddah (JED)', country: 'Saudi Arabia', isIntl: true },
+            { code: 'IST', name: 'Istanbul Airport', city: 'Istanbul (IST)', country: 'Turkey', isIntl: true },
+            { code: 'HKG', name: 'Hong Kong International Airport', city: 'Hong Kong (HKG)', country: 'Hong Kong', isIntl: true }
+        ];
+        window.ALL_AIRPORTS = ALL_AIRPORTS;
 
-            return `
-                <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--border);padding:2rem;margin-bottom:2rem;box-shadow:var(--shadow-sm);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem;">
-                        <div>
-                            <h3 style="font-size:1.3rem;font-weight:800;color:var(--secondary);margin:0;">
-                                <i class="fa-solid fa-train text-primary"></i> Indian Railway Express Reservation
-                            </h3>
-                            <p style="font-size:0.85rem;color:var(--text-muted);margin:0.25rem 0 0;">
-                                Official Indian Railway Reservation with Interactive Berth Layouts & Real-Time Availability
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- 24x7 Indian Railways & IRCTC Helplines Banner -->
-                    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
-                        <div style="font-size:0.8rem;color:#991b1b;">
-                            <strong><i class="fa-solid fa-headset text-danger"></i> Official Railway & IRCTC Helplines:</strong>
-                            <span style="margin-left:0.5rem;">Rail Madad: <a href="tel:139" style="color:#b91c1c;font-weight:700;">139 (24x7)</a> &bull; IRCTC Customer Care: <a href="tel:07556610661" style="color:#b91c1c;font-weight:700;">0755-6610661</a> / <a href="tel:07554090400" style="color:#b91c1c;font-weight:700;">0755-4090400</a> &bull; Support: <a href="mailto:care@irctc.co.in" style="color:#991b1b;text-decoration:none;">care@irctc.co.in</a> &bull; RPF Security: <a href="tel:182" style="color:#b91c1c;font-weight:700;">182</a></span>
-                        </div>
-                        <span style="font-size:0.75rem;background:#991b1b;color:white;padding:0.25rem 0.6rem;border-radius:4px;font-weight:700;">
-                            Bharat Astra Rail Desk: 1800-266-9999 (Ext. 3)
-                        </span>
-                        </div>
-                        <span style="font-size:0.8rem;background:#ecfdf5;color:#065f46;padding:0.25rem 0.65rem;border-radius:999px;font-weight:800;">
-                            Live IRCTC Direct Gateway
-                        </span>
-                    </div>
-
-                    <!-- Search Fields -->
-                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;margin-bottom:1.5rem;background:#f8fafc;padding:1.25rem;border-radius:var(--radius-md);border:1px solid var(--border);">
-                        <div>
-                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">From Station</label>
-                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);" onchange="bookingState.trainFrom=this.value; renderApp();">
-                                ${['New Delhi (NDLS)', 'Howrah Jn (HWH)', 'Mumbai Central (MMCT)', 'KSR Bengaluru (SBC)', 'Chennai Central (MAS)', 'Varanasi Jn (BSB)'].map(s => `<option value="${s}" ${bookingState.trainFrom===s?'selected':''}>${s}</option>`).join('')}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">To Station</label>
-                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);" onchange="bookingState.trainTo=this.value; renderApp();">
-                                ${['Howrah Jn (HWH)', 'New Delhi (NDLS)', 'Mumbai Central (MMCT)', 'KSR Bengaluru (SBC)', 'Chennai Central (MAS)', 'Varanasi Jn (BSB)'].map(s => `<option value="${s}" ${bookingState.trainTo===s?'selected':''}>${s}</option>`).join('')}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Travel Date</label>
-                            <input type="date" value="${bookingState.trainDate}" class="form-control" style="width:100%;padding:0.5rem;border-radius:6px;border:1px solid var(--border);" onchange="bookingState.trainDate=this.value; renderApp();" />
-                        </div>
-
-                        <div>
-                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Travel Class</label>
-                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);" onchange="if(bookingState.trainClass !== this.value){ bookingState.trainClass=this.value; bookingState.selectedTrainSeats=[]; renderApp(); }">
-                                ${['AC 3 Tier (3A)', 'AC 2 Tier (2A)', 'AC 1st Class (1A)', 'Executive Chair Car (EC)', 'AC Chair Car (CC)', 'Sleeper (SL)'].map(c => `<option value="${c}" ${bookingState.trainClass===c?'selected':''}>${c}</option>`).join('')}
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Available Trains -->
-                    <div style="margin-bottom:1.5rem;">
-                        <h4 style="font-size:1rem;font-weight:800;color:var(--secondary);margin-bottom:0.75rem;">
-                            Available Indian Railway Services (${bookingState.trainDate})
-                        </h4>
-                        <div style="display:flex;flex-direction:column;gap:0.75rem;">
-                            ${[
-                                { no: '12301', name: 'Rajdhani Express', dep: '16:55 NDLS', arr: '09:55 HWH', dur: '17h 00m', base: 2850 },
-                                { no: '12259', name: 'Duronto Express', dep: '19:40 NDLS', arr: '12:45 HWH', dur: '17h 05m', base: 2650 },
-                                { no: '12305', name: 'Poorva Express', dep: '17:40 NDLS', arr: '17:00 HWH', dur: '23h 20m', base: 1980 }
-                            ].map(tr => `
-                                <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem;border:1.5px solid ${bookingState.trainName.includes(tr.name) ? 'var(--primary)' : 'var(--border)'};border-radius:8px;background:${bookingState.trainName.includes(tr.name) ? '#eff6ff' : 'white'};flex-wrap:wrap;gap:0.75rem;">
-                                    <div>
-                                        <strong style="font-size:1rem;color:var(--secondary);">${tr.name} (${tr.no})</strong>
-                                        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem;">
-                                            ${tr.dep} ➔ ${tr.arr} • <strong>${tr.dur}</strong>
-                                        </div>
-                                    </div>
-                                    <div style="display:flex;align-items:center;gap:1.5rem;">
-                                        <div style="text-align:right;">
-                                            <div style="font-size:1.15rem;font-weight:900;color:var(--secondary);">${formatINR(Math.round(tr.base * classMultiplier))}</div>
-                                            <span style="font-size:0.72rem;color:var(--success);font-weight:700;">AVAILABLE (WL-0 / CNF)</span>
-                                        </div>
-                                        <button class="btn btn-sm ${bookingState.trainName.includes(tr.name) ? 'btn-primary' : 'btn-outline'}"
-                                                onclick="bookingState.trainName='${tr.name} (${tr.no})'; bookingState.trainBasePrice=${tr.base}; renderApp();">
-                                            ${bookingState.trainName.includes(tr.name) ? '<i class=\"fa-solid fa-check\"></i> Selected' : 'Choose Train'}
-                                        </button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <!-- Interactive Coach & Berth Map -->
-                    <div style="background:#f8fafc;padding:1.25rem;border-radius:var(--radius-md);border:1px solid var(--border);margin-bottom:1.5rem;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
-                            <div>
-                                <h4 style="font-size:0.95rem;font-weight:800;color:var(--secondary);margin:0;">
-                                    <i class="fa-solid fa-chair text-primary"></i> Select Berths / Seats (${bookingState.trainClass})
-                                </h4>
-                                <span style="font-size:0.8rem;color:var(--text-muted);">
-                                    Active: ${bookingState.trainName} • ${getTrainCoachAndLayout(bookingState.trainClass).coach}
-                                </span>
-                            </div>
-                            <div style="font-size:0.85rem;font-weight:700;color:var(--primary);">
-                                Selected (${bookingState.selectedTrainSeats.length}): ${bookingState.selectedTrainSeats.join(', ') || 'None'}
-                            </div>
-                        </div>
-
-                        <!-- Class-Specific Berth / Seat Layout -->
-                        <div style="max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:0.75rem;">
-                            ${getTrainCoachAndLayout(bookingState.trainClass).bays.map(b => `
-                                <div style="background:white;padding:0.75rem 1rem;border-radius:8px;border:1px solid var(--border);">
-                                    <div style="font-size:0.75rem;font-weight:800;color:var(--text-muted);margin-bottom:0.5rem;">${b.bay}</div>
-                                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
-                                        ${b.berths.map(berth => {
-                                            const isSel = bookingState.selectedTrainSeats.includes(berth);
-                                            return `
-                                                <button type="button" 
-                                                        onclick="toggleTrainBerth('${berth}')"
-                                                        style="padding:0.35rem 0.65rem;border-radius:6px;font-size:0.75rem;font-weight:700;border:1px solid ${isSel ? 'var(--primary)' : 'var(--border)'};background:${isSel ? 'var(--primary)' : '#f8fafc'};color:${isSel ? 'white' : 'var(--secondary)'};cursor:pointer;">
-                                                    ${berth}
-                                                </button>
-                                            `;
-                                        }).join('')}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <!-- Summary & Checkout -->
-                    <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:1rem;flex-wrap:wrap;gap:1rem;">
-                        <div>
-                            <span style="font-size:0.8rem;color:var(--text-muted);">Total Train Fare (${bookingState.selectedTrainSeats.length} berths):</span>
-                            <div style="font-size:1.5rem;font-weight:900;color:var(--secondary);">${formatINR(totalFare)}</div>
-                        </div>
-                        <button class="btn btn-fk-buy btn-lg" onclick="addTrainToCart()">
-                            <i class="fa-solid fa-cart-shopping"></i> Add Railway Tickets to Cart (${formatINR(totalFare)})
-                        </button>
-                    </div>
-                </div>
-            `;
+        function getFlightClassMultiplier(cls) {
+            if (cls === 'First Class Suite') return 5.8;
+            if (cls === 'Business') return 3.2;
+            if (cls === 'Premium Economy') return 1.65;
+            return 1.0; // Economy
         }
+        window.getFlightClassMultiplier = getFlightClassMultiplier;
 
-        function toggleTrainBerth(berth) {
-            if (bookingState.selectedTrainSeats.includes(berth)) {
-                bookingState.selectedTrainSeats = bookingState.selectedTrainSeats.filter(b => b !== berth);
+        function getRouteFlightCatalog(fromStr, toStr, cabinClass) {
+            const fromUpper = (fromStr || '').toUpperCase();
+            const toUpper = (toStr || '').toUpperCase();
+
+            const isEuropeUK = toUpper.includes('LHR') || toUpper.includes('LGW') || toUpper.includes('CDG') || toUpper.includes('FRA') || toUpper.includes('AMS') || toUpper.includes('ZRH') || toUpper.includes('IST') ||
+                              fromUpper.includes('LHR') || fromUpper.includes('LGW') || fromUpper.includes('CDG') || fromUpper.includes('FRA') || fromUpper.includes('AMS') || fromUpper.includes('ZRH') || fromUpper.includes('IST');
+            const isNorthAmerica = toUpper.includes('JFK') || toUpper.includes('EWR') || toUpper.includes('SFO') || toUpper.includes('ORD') || toUpper.includes('YYZ') ||
+                                   fromUpper.includes('JFK') || fromUpper.includes('EWR') || fromUpper.includes('SFO') || fromUpper.includes('ORD') || fromUpper.includes('YYZ');
+            const isAustraliaFarEast = toUpper.includes('SYD') || toUpper.includes('MEL') || toUpper.includes('HND') || toUpper.includes('HKG') ||
+                                       fromUpper.includes('SYD') || fromUpper.includes('MEL') || fromUpper.includes('HND') || fromUpper.includes('HKG');
+            const isMiddleEast = toUpper.includes('DXB') || toUpper.includes('AUH') || toUpper.includes('DOH') || toUpper.includes('MCT') || toUpper.includes('JED') ||
+                                 fromUpper.includes('DXB') || fromUpper.includes('AUH') || fromUpper.includes('DOH') || fromUpper.includes('MCT') || fromUpper.includes('JED');
+            const isSEAsiaSubcontinent = toUpper.includes('SIN') || toUpper.includes('BKK') || toUpper.includes('KUL') || toUpper.includes('CMB') || toUpper.includes('KTM') || toUpper.includes('MLE') || toUpper.includes('DAC') ||
+                                         fromUpper.includes('SIN') || fromUpper.includes('BKK') || fromUpper.includes('KUL') || fromUpper.includes('CMB') || fromUpper.includes('KTM') || fromUpper.includes('MLE') || fromUpper.includes('DAC');
+
+            let routeCategory = 'domestic_medium';
+            let baseEconomy = 5800;
+            let flights = [];
+
+            if (isNorthAmerica || isAustraliaFarEast) {
+                routeCategory = 'intl_ultra_long';
+                baseEconomy = 82000;
+                flights = [
+                    { al: 'Air India', no: 'AI-187', dep: '02:30', arr: '07:45 (+1d)', dur: '15h 45m (Non-Stop)', craft: 'Boeing 777-200LR Worldliner', base: 82000 },
+                    { al: 'United Airlines', no: 'UA-83', dep: '23:35', arr: '04:55 (+1d)', dur: '15h 50m (Direct)', craft: 'Boeing 787-9 Dreamliner', base: 86500 },
+                    { al: 'Emirates (via DXB)', no: 'EK-201', dep: '04:15', arr: '14:25', dur: '17h 40m (1 Stop)', craft: 'Airbus A380 Superjumbo', base: 89000 },
+                    { al: 'Qatar Airways (via DOH)', no: 'QR-701', dep: '03:40', arr: '15:10', dur: '18h 00m (Qsuite)', craft: 'Airbus A350-1000', base: 92000 }
+                ];
+            } else if (isEuropeUK) {
+                routeCategory = 'intl_long_haul';
+                baseEconomy = 58000;
+                flights = [
+                    { al: 'British Airways', no: 'BA-118', dep: '07:15', arr: '13:45', dur: '09h 00m (Direct)', craft: 'Boeing 777-300ER Club World', base: 62500 },
+                    { al: 'Air India', no: 'AI-131', dep: '06:00', arr: '12:30', dur: '08h 45m (Non-Stop)', craft: 'Boeing 787-9 Dreamliner', base: 58000 },
+                    { al: 'Virgin Atlantic', no: 'VS-301', dep: '13:10', arr: '19:40', dur: '09h 00m (Upper Class)', craft: 'Airbus A350-1000', base: 64000 },
+                    { al: 'Emirates (via DXB)', no: 'EK-571', dep: '09:45', arr: '18:20', dur: '11h 05m (1 Stop)', craft: 'Airbus A380 Superjumbo', base: 61000 }
+                ];
+            } else if (isMiddleEast) {
+                routeCategory = 'intl_mid_haul';
+                baseEconomy = 21500;
+                flights = [
+                    { al: 'Emirates', no: 'EK-511', dep: '04:15', arr: '06:30', dur: '03h 45m (Non-Stop)', craft: 'Boeing 777-300ER', base: 24000 },
+                    { al: 'Air India Express', no: 'IX-193', dep: '09:20', arr: '11:45', dur: '03h 55m (Direct)', craft: 'Boeing 737 MAX 8', base: 19800 },
+                    { al: 'IndiGo', no: '6E-1405', dep: '18:30', arr: '21:00', dur: '04h 00m (Non-Stop)', craft: 'Airbus A321neo', base: 21500 },
+                    { al: 'Etihad Airways', no: 'EY-217', dep: '21:10', arr: '23:45', dur: '04h 05m (Direct)', craft: 'Airbus A350-900', base: 26500 }
+                ];
+            } else if (isSEAsiaSubcontinent) {
+                routeCategory = 'intl_se_asia';
+                baseEconomy = 23500;
+                flights = [
+                    { al: 'Singapore Airlines', no: 'SQ-403', dep: '23:10', arr: '06:50 (+1d)', dur: '05h 10m (Direct)', craft: 'Airbus A350-900', base: 28500 },
+                    { al: 'Thai Airways', no: 'TG-314', dep: '00:15', arr: '05:40', dur: '03h 55m (Non-Stop)', craft: 'Boeing 787-8', base: 24500 },
+                    { al: 'IndiGo', no: '6E-1055', dep: '08:20', arr: '15:10', dur: '04h 20m (Non-Stop)', craft: 'Airbus A321neo', base: 22000 },
+                    { al: 'Air India', no: 'AI-380', dep: '14:05', arr: '21:30', dur: '04h 55m (Direct)', craft: 'Airbus A320neo', base: 23500 }
+                ];
             } else {
-                bookingState.selectedTrainSeats.push(berth);
+                // Domestic Route
+                const isShort = (fromUpper.includes('BOM') && toUpper.includes('GOI')) || (fromUpper.includes('GOI') && toUpper.includes('BOM')) ||
+                                (fromUpper.includes('DEL') && toUpper.includes('JAI')) || (fromUpper.includes('JAI') && toUpper.includes('DEL')) ||
+                                (fromUpper.includes('BLR') && toUpper.includes('MAA')) || (fromUpper.includes('MAA') && toUpper.includes('BLR')) ||
+                                (fromUpper.includes('PNQ') && toUpper.includes('GOI')) || (fromUpper.includes('GOI') && toUpper.includes('PNQ'));
+                const isLong = fromUpper.includes('IXZ') || toUpper.includes('IXZ') ||
+                               (fromUpper.includes('DEL') && toUpper.includes('COK')) || (fromUpper.includes('COK') && toUpper.includes('DEL')) ||
+                               (fromUpper.includes('CCU') && toUpper.includes('BLR')) || (fromUpper.includes('BLR') && toUpper.includes('CCU')) ||
+                               (fromUpper.includes('DEL') && toUpper.includes('TRV')) || (fromUpper.includes('TRV') && toUpper.includes('DEL'));
+
+                if (isShort) {
+                    baseEconomy = 3800;
+                    flights = [
+                        { al: 'IndiGo', no: '6E-451', dep: '06:15', arr: '07:25', dur: '01h 10m (Non-Stop)', craft: 'Airbus A320neo', base: 3800 },
+                        { al: 'Air India', no: 'AI-623', dep: '10:40', arr: '11:55', dur: '01h 15m (Non-Stop)', craft: 'Airbus A320neo', base: 4200 },
+                        { al: 'Akasa Air', no: 'QP-1321', dep: '15:20', arr: '16:35', dur: '01h 15m (Non-Stop)', craft: 'Boeing 737 MAX 8', base: 3650 },
+                        { al: 'SpiceJet', no: 'SG-214', dep: '19:45', arr: '21:00', dur: '01h 15m (Non-Stop)', craft: 'Boeing 737-800', base: 3750 }
+                    ];
+                } else if (isLong) {
+                    baseEconomy = 7800;
+                    flights = [
+                        { al: 'Air India', no: 'AI-772', dep: '06:30', arr: '09:40', dur: '03h 10m (Non-Stop)', craft: 'Boeing 787-8 Dreamliner', base: 8400 },
+                        { al: 'IndiGo', no: '6E-289', dep: '11:15', arr: '14:30', dur: '03h 15m (Non-Stop)', craft: 'Airbus A321neo', base: 7800 },
+                        { al: 'Vistara', no: 'UK-845', dep: '16:40', arr: '19:55', dur: '03h 15m (Non-Stop)', craft: 'Boeing 787-9 Dreamliner', base: 9200 },
+                        { al: 'Akasa Air', no: 'QP-1502', dep: '20:10', arr: '23:25', dur: '03h 15m (Non-Stop)', craft: 'Boeing 737 MAX 8', base: 7600 }
+                    ];
+                } else {
+                    baseEconomy = 5600;
+                    flights = [
+                        { al: 'Air India', no: 'AI-805', dep: '06:00', arr: '08:15', dur: '02h 15m (Non-Stop)', craft: 'Boeing 787-9 Dreamliner', base: 5800 },
+                        { al: 'IndiGo', no: '6E-2041', dep: '11:30', arr: '13:45', dur: '02h 15m (Non-Stop)', craft: 'Airbus A321neo', base: 5200 },
+                        { al: 'Vistara', no: 'UK-992', dep: '17:15', arr: '19:30', dur: '02h 15m (Non-Stop)', craft: 'Boeing 787-9 Dreamliner', base: 6400 },
+                        { al: 'Akasa Air', no: 'QP-1102', dep: '20:50', arr: '23:05', dur: '02h 15m (Non-Stop)', craft: 'Boeing 737 MAX 8', base: 4950 }
+                    ];
+                }
+            }
+
+            return { routeCategory, baseEconomy, flights };
+        }
+        window.getRouteFlightCatalog = getRouteFlightCatalog;
+
+        function handleFlightRouteChange(type, value) {
+            if (type === 'from') bookingState.flightFrom = value;
+            if (type === 'to') bookingState.flightTo = value;
+
+            const catalog = getRouteFlightCatalog(bookingState.flightFrom, bookingState.flightTo, bookingState.flightClass);
+            if (catalog.flights && catalog.flights.length > 0) {
+                const top = catalog.flights[0];
+                bookingState.flightAirline = top.al;
+                bookingState.flightNumber = top.no;
+                bookingState.flightTime = `${top.dep} - ${top.arr}`;
+                bookingState.flightBasePrice = top.base;
             }
             renderApp();
         }
+        window.handleFlightRouteChange = handleFlightRouteChange;
 
-        function addTrainToCart() {
-            if (bookingState.selectedTrainSeats.length === 0) {
-                showToast('Please select at least 1 berth/seat before booking!', 'warning');
+        function handleFlightClassChange(newClass) {
+            bookingState.flightClass = newClass;
+            const catalog = getRouteFlightCatalog(bookingState.flightFrom, bookingState.flightTo, newClass);
+            const match = catalog.flights.find(f => f.no === bookingState.flightNumber) || catalog.flights[0];
+            if (match) {
+                bookingState.flightBasePrice = match.base;
+            }
+            renderApp();
+        }
+        window.handleFlightClassChange = handleFlightClassChange;
+
+        function selectScheduledFlight(airline, flightNo, time, basePrice) {
+            bookingState.flightAirline = airline;
+            bookingState.flightNumber = flightNo;
+            bookingState.flightTime = time;
+            bookingState.flightBasePrice = basePrice;
+            showToast(`Selected ${airline} (${flightNo}) on ${bookingState.flightDate}`, 'info');
+            renderApp();
+        }
+        window.selectScheduledFlight = selectScheduledFlight;
+
+        function toggleFlightSeat(seatNo) {
+            if (bookingState.selectedFlightSeats.includes(seatNo)) {
+                bookingState.selectedFlightSeats = bookingState.selectedFlightSeats.filter(s => s !== seatNo);
+            } else {
+                bookingState.selectedFlightSeats.push(seatNo);
+            }
+            renderApp();
+        }
+        window.toggleFlightSeat = toggleFlightSeat;
+
+        function addFlightToCart() {
+            if (bookingState.selectedFlightSeats.length === 0) {
+                showToast('Please select at least 1 aircraft seat before booking!', 'warning');
                 return;
             }
 
-            let classMultiplier = 1.0;
-            if (bookingState.trainClass.includes('2A')) classMultiplier = 1.4;
-            else if (bookingState.trainClass.includes('1A') || bookingState.trainClass.includes('Executive')) classMultiplier = 2.0;
-
-            const unitFare = Math.round(bookingState.trainBasePrice * classMultiplier);
-            const totalFare = bookingState.selectedTrainSeats.length * unitFare;
+            const classMultiplier = getFlightClassMultiplier(bookingState.flightClass);
+            const unitFare = Math.round(bookingState.flightBasePrice * classMultiplier);
+            const totalFare = bookingState.selectedFlightSeats.length * unitFare;
             const custName = (state.currentUser && state.currentUser.name) ? state.currentUser.name : 'Bharat Astra VIP Guest';
 
             const bookingItem = {
-                id: `train-${Date.now()}`,
-                productId: `train-irctc`,
-                name: `[Indian Railway] ${bookingState.trainName} • ${bookingState.trainFrom} ➔ ${bookingState.trainTo}`,
+                id: `flight-${bookingState.flightNumber}-${Date.now()}`,
+                productId: `flight-${bookingState.flightNumber}`,
+                name: `[Flight] ${bookingState.flightAirline} (${bookingState.flightNumber}) • ${bookingState.flightFrom} ➔ ${bookingState.flightTo}`,
                 price: totalFare,
-                originalPrice: Math.round(totalFare * 1.2),
-                image: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=500&auto=format&fit=crop&q=80',
-                size: `Class: ${bookingState.trainClass} • Date: ${bookingState.trainDate}`,
-                color: `Berths: ${bookingState.selectedTrainSeats.join(', ')}`,
+                originalPrice: Math.round(totalFare * 1.3),
+                image: 'https://images.unsplash.com/photo-1544016768-982d1554f0b9?w=500&auto=format&fit=crop&q=80',
+                size: `Class: ${bookingState.flightClass} • Date: ${bookingState.flightDate}`,
+                color: `Seats: ${bookingState.selectedFlightSeats.join(', ')}`,
                 storage: null,
                 quantity: 1,
                 category: 'Travel & Entertainment',
-                bookingType: 'railway',
+                bookingType: 'flight',
                 bookingDetails: {
-                    trainName: bookingState.trainName,
-                    date: bookingState.trainDate,
-                    class: bookingState.trainClass,
-                    from: bookingState.trainFrom,
-                    to: bookingState.trainTo,
-                    berths: bookingState.selectedTrainSeats.join(', '),
+                    airline: bookingState.flightAirline,
+                    flightNo: bookingState.flightNumber,
+                    date: bookingState.flightDate,
+                    time: bookingState.flightTime,
+                    from: bookingState.flightFrom,
+                    to: bookingState.flightTo,
+                    class: bookingState.flightClass,
+                    seats: bookingState.selectedFlightSeats.join(', '),
                     passenger: custName
                 }
             };
@@ -4991,13 +5060,11 @@
                 }
             });
 
-            showToast(`🚆 ${bookingState.trainName} e-Tickets added to cart!`, 'success');
+            showToast(`✈️ ${bookingState.flightAirline} confirmed for ${bookingState.selectedFlightSeats.length} passenger(s)!`, 'success');
             openCartDrawer();
         }
+        window.addFlightToCart = addFlightToCart;
 
-        // ============================================================
-        // D. WORLDWIDE FLIGHT BOOKING WITH DYNAMIC CABIN SEAT MAP
-        // ============================================================
         function renderFlightSeatUnit(seatNo, label = '') {
             const isSelected = bookingState.selectedFlightSeats.includes(seatNo);
             return `
@@ -5046,26 +5113,39 @@
         }
 
         function renderFlightBookingHTML() {
-            let classMultiplier = 1.0;
-            if (bookingState.flightClass === 'Premium Economy') classMultiplier = 1.4;
-            else if (bookingState.flightClass === 'Business') classMultiplier = 2.6;
-            else if (bookingState.flightClass === 'First Class Suite') classMultiplier = 4.5;
+            const classMultiplier = getFlightClassMultiplier(bookingState.flightClass);
+            const routeData = getRouteFlightCatalog(bookingState.flightFrom, bookingState.flightTo, bookingState.flightClass);
+
+            // Ensure active flight matches current route
+            let activeFlight = routeData.flights.find(f => f.no === bookingState.flightNumber);
+            if (!activeFlight) {
+                activeFlight = routeData.flights[0];
+                bookingState.flightAirline = activeFlight.al;
+                bookingState.flightNumber = activeFlight.no;
+                bookingState.flightTime = `${activeFlight.dep} - ${activeFlight.arr}`;
+                bookingState.flightBasePrice = activeFlight.base;
+            }
 
             const unitFare = Math.round(bookingState.flightBasePrice * classMultiplier);
-            const totalPersons = (bookingState.flightAdults || 1) + (bookingState.flightChildren || 0);
-            const totalFare = bookingState.selectedFlightSeats.length * unitFare;
+            const totalFare = (bookingState.selectedFlightSeats.length || 1) * unitFare;
+
+            const domAirports = ALL_AIRPORTS.filter(a => !a.isIntl);
+            const intlAirports = ALL_AIRPORTS.filter(a => a.isIntl);
 
             return `
                 <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--border);padding:2rem;margin-bottom:2rem;box-shadow:var(--shadow-sm);">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem;">
                         <div>
                             <h3 style="font-size:1.3rem;font-weight:800;color:var(--secondary);margin:0;">
-                                <i class="fa-solid fa-plane-departure text-primary"></i> Worldwide Flight Logistics
+                                <i class="fa-solid fa-plane-departure text-primary"></i> Worldwide Flight Logistics (All Indian & Global Routes)
                             </h3>
                             <p style="font-size:0.85rem;color:var(--text-muted);margin:0.25rem 0 0;">
-                                Select departure date, total passengers, cabin travel class, and interactive aircraft seats.
+                                Search domestic flights across all Indian commercial airports and international long-haul connections worldwide with live cabin class fare calculation.
                             </p>
                         </div>
+                        <span style="font-size:0.8rem;background:#e0e7ff;color:var(--primary);padding:0.25rem 0.65rem;border-radius:999px;font-weight:800;">
+                            Passenger: ${state.currentUser ? state.currentUser.name : 'Bharat Astra VIP Guest'}
+                        </span>
                     </div>
 
                     <!-- 24x7 Airline Customer Care Directory Banner -->
@@ -5077,65 +5157,87 @@
                         <span style="font-size:0.75rem;background:#1e40af;color:white;padding:0.25rem 0.6rem;border-radius:4px;font-weight:700;">
                             Bharat Astra Flight Desk: 1800-266-9999 (Ext. 2)
                         </span>
-                        </div>
-                        <span style="font-size:0.8rem;background:#e0e7ff;color:var(--primary);padding:0.25rem 0.65rem;border-radius:999px;font-weight:800;">
-                            Passenger: ${state.currentUser ? state.currentUser.name : 'Bharat Astra VIP Guest'}
-                        </span>
                     </div>
 
                     <!-- Search Controls -->
-                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;margin-bottom:1.5rem;background:#f8fafc;padding:1.25rem;border-radius:var(--radius-md);border:1px solid var(--border);">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1rem;margin-bottom:1.5rem;background:#f8fafc;padding:1.25rem;border-radius:var(--radius-md);border:1px solid var(--border);">
                         <div>
-                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">From Origin</label>
-                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);" onchange="bookingState.flightFrom=this.value; renderApp();">
-                                ${['New Delhi (DEL)', 'Mumbai (BOM)', 'Bengaluru (BLR)', 'Kolkata (CCU)', 'Hyderabad (HYD)', 'Chennai (MAA)', 'Dubai (DXB)', 'London Heathrow (LHR)'].map(c => `<option value="${c}" ${bookingState.flightFrom===c?'selected':''}>${c}</option>`).join('')}
+                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-plane-departure text-primary"></i> From Origin Airport
+                            </label>
+                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);font-size:0.85rem;" onchange="handleFlightRouteChange('from', this.value)">
+                                <optgroup label="🇮🇳 Indian Commercial Airports (National)">
+                                    ${domAirports.map(a => `<option value="${a.city} (${a.code})" ${bookingState.flightFrom.includes(a.code)?'selected':''}>${a.city} - ${a.name} (${a.code})</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="🌍 International Gateways">
+                                    ${intlAirports.map(a => `<option value="${a.city}" ${bookingState.flightFrom.includes(a.code)?'selected':''}>${a.city} - ${a.name} (${a.country})</option>`).join('')}
+                                </optgroup>
                             </select>
                         </div>
 
                         <div>
-                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">To Destination</label>
-                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);" onchange="bookingState.flightTo=this.value; renderApp();">
-                                ${['Mumbai (BOM)', 'New Delhi (DEL)', 'Bengaluru (BLR)', 'Kolkata (CCU)', 'Hyderabad (HYD)', 'Chennai (MAA)', 'Dubai (DXB)', 'London Heathrow (LHR)', 'Singapore (SIN)'].map(c => `<option value="${c}" ${bookingState.flightTo===c?'selected':''}>${c}</option>`).join('')}
+                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-plane-arrival text-primary"></i> To Destination Airport
+                            </label>
+                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);font-size:0.85rem;" onchange="handleFlightRouteChange('to', this.value)">
+                                <optgroup label="🌍 International Destinations">
+                                    ${intlAirports.map(a => `<option value="${a.city}" ${bookingState.flightTo.includes(a.code)?'selected':''}>${a.city} - ${a.name} (${a.country})</option>`).join('')}
+                                </optgroup>
+                                <optgroup label="🇮🇳 Indian Commercial Airports (National)">
+                                    ${domAirports.map(a => `<option value="${a.city} (${a.code})" ${bookingState.flightTo.includes(a.code)?'selected':''}>${a.city} - ${a.name} (${a.code})</option>`).join('')}
+                                </optgroup>
                             </select>
                         </div>
 
                         <div>
-                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Flight Date</label>
-                            <input type="date" value="${bookingState.flightDate}" class="form-control" style="width:100%;padding:0.5rem;border-radius:6px;border:1px solid var(--border);" onchange="bookingState.flightDate=this.value; renderApp();" />
+                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-calendar text-primary"></i> Flight Date
+                            </label>
+                            <input type="date" value="${bookingState.flightDate}" class="form-control" style="width:100%;padding:0.5rem;border-radius:6px;border:1px solid var(--border);font-size:0.85rem;" onchange="bookingState.flightDate=this.value; renderApp();" />
                         </div>
 
                         <div>
-                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Cabin Travel Class</label>
-                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);" 
-                                    onchange="bookingState.flightClass=this.value; bookingState.selectedFlightSeats=[]; renderApp();">
-                                ${['Economy', 'Premium Economy', 'Business', 'First Class Suite'].map(c => `<option value="${c}" ${bookingState.flightClass===c?'selected':''}>${c}</option>`).join('')}
+                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-couch text-primary"></i> Cabin Travel Class
+                            </label>
+                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);font-size:0.85rem;" 
+                                    onchange="handleFlightClassChange(this.value)">
+                                ${['Economy', 'Premium Economy', 'Business', 'First Class Suite'].map(c => `<option value="${c}" ${bookingState.flightClass===c?'selected':''}>${c} (${getFlightClassMultiplier(c)}x Multiplier)</option>`).join('')}
                             </select>
                         </div>
+                    </div>
+
+                    <!-- Live Route Summary & Cabin Pricing Indicator -->
+                    <div style="background:#f8fafc;border-left:4px solid var(--primary);padding:0.85rem 1.25rem;border-radius:0 8px 8px 0;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;">
+                        <div>
+                            <strong style="color:var(--secondary);font-size:0.95rem;">${bookingState.flightFrom} ➔ ${bookingState.flightTo}</strong>
+                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px;">
+                                Selected Cabin: <strong style="color:var(--primary);">${bookingState.flightClass}</strong> (${classMultiplier}x) • Base Route Fare: ${formatINR(bookingState.flightBasePrice)} • Single Ticket Fare: <strong style="color:var(--secondary);">${formatINR(unitFare)}</strong>
+                            </div>
+                        </div>
+                        <span style="font-size:0.78rem;background:#e0f2fe;color:#0369a1;padding:0.35rem 0.75rem;border-radius:999px;font-weight:700;">
+                            4 Daily Scheduled Departures Available
+                        </span>
                     </div>
 
                     <!-- Scheduled Flights Table -->
                     <div style="margin-bottom:1.5rem;">
                         <h4 style="font-size:1rem;font-weight:800;color:var(--secondary);margin-bottom:0.75rem;">
-                            Direct Flight Schedules (${bookingState.flightDate})
+                            Direct & Connecting Flights for ${bookingState.flightFrom} ➔ ${bookingState.flightTo} (${bookingState.flightDate})
                         </h4>
                         <div style="overflow-x:auto;border:1px solid var(--border);border-radius:8px;">
                             <table style="width:100%;border-collapse:collapse;font-size:0.85rem;text-align:left;">
                                 <thead>
                                     <tr style="background:#f8fafc;border-bottom:1px solid var(--border);">
                                         <th style="padding:0.75rem 1rem;">Airline / Flight No</th>
-                                        <th style="padding:0.75rem 1rem;">Departure / Arrival</th>
+                                        <th style="padding:0.75rem 1rem;">Departure ➔ Arrival (Duration)</th>
                                         <th style="padding:0.75rem 1rem;">Aircraft Model</th>
-                                        <th style="padding:0.75rem 1rem;">Class Fare</th>
+                                        <th style="padding:0.75rem 1rem;">${bookingState.flightClass} Fare</th>
                                         <th style="padding:0.75rem 1rem;text-align:right;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${[
-                                        { al: 'Air India', no: 'AI-805', dep: '06:00', arr: '08:15', craft: 'Boeing 787-9 Dreamliner', base: 5600 },
-                                        { al: 'IndiGo', no: '6E-2041', dep: '11:30', arr: '13:45', craft: 'Airbus A321neo', base: 4950 },
-                                        { al: 'Vistara', no: 'UK-992', dep: '17:15', arr: '19:30', craft: 'Boeing 777-300ER', base: 6200 },
-                                        { al: 'Emirates / Codeshare', no: 'EK-512', dep: '21:40', arr: '23:55', craft: 'Airbus A380 Superjumbo', base: 9800 }
-                                    ].map(f => {
+                                    ${routeData.flights.map(f => {
                                         const fare = Math.round(f.base * classMultiplier);
                                         const isSel = (bookingState.flightNumber === f.no);
                                         return `
@@ -5145,13 +5247,14 @@
                                                 </td>
                                                 <td style="padding:0.75rem 1rem;">
                                                     <strong>${f.dep}</strong> ➔ <strong>${f.arr}</strong>
+                                                    <span style="font-size:0.75rem;color:var(--text-muted);margin-left:0.4rem;">(${f.dur})</span>
                                                 </td>
                                                 <td style="padding:0.75rem 1rem;color:var(--text-muted);">${f.craft}</td>
-                                                <td style="padding:0.75rem 1rem;font-weight:800;color:var(--secondary);">${formatINR(fare)}</td>
+                                                <td style="padding:0.75rem 1rem;font-weight:800;color:var(--secondary);font-size:0.95rem;">${formatINR(fare)}</td>
                                                 <td style="padding:0.75rem 1rem;text-align:right;">
                                                     <button class="btn btn-sm ${isSel ? 'btn-primary' : 'btn-outline'}" 
                                                             onclick="selectScheduledFlight('${f.al}', '${f.no}', '${f.dep} - ${f.arr}', ${f.base})">
-                                                        ${isSel ? '<i class=\"fa-solid fa-check\"></i> Selected' : 'Select'}
+                                                        ${isSel ? '<i class=\"fa-solid fa-check\"></i> Selected' : 'Select Flight'}
                                                     </button>
                                                 </td>
                                             </tr>
@@ -5170,7 +5273,7 @@
                                     <i class="fa-solid fa-chair text-primary"></i> Aircraft Seat Selection: ${bookingState.flightClass}
                                 </h4>
                                 <span style="font-size:0.8rem;color:var(--text-muted);">
-                                    Flight: ${bookingState.flightAirline} (${bookingState.flightNumber}) • Date: ${bookingState.flightDate}
+                                    Flight: ${bookingState.flightAirline} (${bookingState.flightNumber}) • Date: ${bookingState.flightDate} • Per Seat: ${formatINR(unitFare)}
                                 </span>
                             </div>
                             <div style="font-size:0.85rem;font-weight:700;color:var(--primary);">
@@ -5264,7 +5367,7 @@
                     <!-- Fare & Checkout -->
                     <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:1rem;flex-wrap:wrap;gap:1rem;">
                         <div>
-                            <span style="font-size:0.8rem;color:var(--text-muted);">Total Airfare (${bookingState.selectedFlightSeats.length} seats):</span>
+                            <span style="font-size:0.8rem;color:var(--text-muted);">Total Airfare (${bookingState.selectedFlightSeats.length || 1} seat(s) • ${bookingState.flightClass}):</span>
                             <div style="font-size:1.5rem;font-weight:900;color:var(--secondary);">${formatINR(totalFare)}</div>
                         </div>
                         <button class="btn btn-fk-buy btn-lg" onclick="addFlightToCart()">
@@ -5274,62 +5377,246 @@
                 </div>
             `;
         }
+        window.renderFlightBookingHTML = renderFlightBookingHTML;
 
-        function selectScheduledFlight(airline, flightNo, time, basePrice) {
-            bookingState.flightAirline = airline;
-            bookingState.flightNumber = flightNo;
-            bookingState.flightTime = time;
-            bookingState.flightBasePrice = basePrice;
-            showToast(`Selected ${airline} (${flightNo}) on ${bookingState.flightDate}`, 'info');
-            renderApp();
+        // ============================================================
+        // D. NATIONWIDE INDIAN RAILWAYS NETWORK (ALL 18 ZONES & CONNECTIONS)
+        // ============================================================
+        const ALL_RAILWAY_STATIONS = [
+            // Northern Railway & NCR Hubs
+            { code: 'NDLS', name: 'New Delhi', zone: 'NR - Northern Railway', city: 'Delhi' },
+            { code: 'DLI', name: 'Old Delhi Jn', zone: 'NR - Northern Railway', city: 'Delhi' },
+            { code: 'NZM', name: 'Hazrat Nizamuddin', zone: 'NR - Northern Railway', city: 'Delhi' },
+            { code: 'ANVT', name: 'Anand Vihar Terminal', zone: 'NR - Northern Railway', city: 'Delhi' },
+            { code: 'CDG', name: 'Chandigarh Jn', zone: 'NR - Northern Railway', city: 'Chandigarh' },
+            { code: 'ASR', name: 'Amritsar Jn', zone: 'NR - Northern Railway', city: 'Amritsar' },
+            { code: 'JAT', name: 'Jammu Tawi', zone: 'NR - Northern Railway', city: 'Jammu' },
+            { code: 'SVDK', name: 'Shri Mata Vaishno Devi Katra', zone: 'NR - Northern Railway', city: 'Katra' },
+            { code: 'HW', name: 'Haridwar Jn', zone: 'NR - Northern Railway', city: 'Haridwar' },
+            { code: 'DDN', name: 'Dehradun Terminal', zone: 'NR - Northern Railway', city: 'Dehradun' },
+            { code: 'LKO', name: 'Lucknow Charbagh', zone: 'NR - Northern Railway', city: 'Lucknow' },
+            { code: 'CNB', name: 'Kanpur Central', zone: 'NCR - North Central', city: 'Kanpur' },
+            { code: 'PRYJ', name: 'Prayagraj Jn (Allahabad)', zone: 'NCR - North Central', city: 'Prayagraj' },
+            { code: 'BSB', name: 'Varanasi Jn', zone: 'NR - Northern Railway', city: 'Varanasi' },
+            { code: 'AGC', name: 'Agra Cantt', zone: 'NCR - North Central', city: 'Agra' },
+            { code: 'GKP', name: 'Gorakhpur Jn', zone: 'NER - North Eastern', city: 'Gorakhpur' },
+
+            // Eastern & South Eastern (Kolkata & East)
+            { code: 'HWH', name: 'Howrah Jn', zone: 'ER - Eastern Railway', city: 'Kolkata' },
+            { code: 'SDAH', name: 'Sealdah Terminal', zone: 'ER - Eastern Railway', city: 'Kolkata' },
+            { code: 'SHM', name: 'Shalimar Terminal', zone: 'SER - South Eastern', city: 'Kolkata' },
+            { code: 'KOAA', name: 'Kolkata Chitpur Terminal', zone: 'ER - Eastern Railway', city: 'Kolkata' },
+            { code: 'PNBE', name: 'Patna Jn', zone: 'ECR - East Central', city: 'Patna' },
+            { code: 'GAYA', name: 'Gaya Jn', zone: 'ECR - East Central', city: 'Gaya' },
+            { code: 'RNC', name: 'Ranchi Jn', zone: 'SER - South Eastern', city: 'Ranchi' },
+            { code: 'DHN', name: 'Dhanbad Jn', zone: 'ECR - East Central', city: 'Dhanbad' },
+            { code: 'TATA', name: 'Tatanagar Jn (Jamshedpur)', zone: 'SER - South Eastern', city: 'Jamshedpur' },
+            { code: 'NJP', name: 'New Jalpaiguri Jn (Siliguri)', zone: 'NFR - Northeast Frontier', city: 'Siliguri' },
+
+            // Western & Central (Mumbai, Gujarat, Rajasthan, MP)
+            { code: 'MMCT', name: 'Mumbai Central', zone: 'WR - Western Railway', city: 'Mumbai' },
+            { code: 'CSMT', name: 'Chhatrapati Shivaji Maharaj Terminus', zone: 'CR - Central Railway', city: 'Mumbai' },
+            { code: 'BDTS', name: 'Bandra Terminus', zone: 'WR - Western Railway', city: 'Mumbai' },
+            { code: 'LTT', name: 'Lokmanya Tilak Terminus', zone: 'CR - Central Railway', city: 'Mumbai' },
+            { code: 'PUNE', name: 'Pune Jn', zone: 'CR - Central Railway', city: 'Pune' },
+            { code: 'ADI', name: 'Ahmedabad Jn (Kalupur)', zone: 'WR - Western Railway', city: 'Ahmedabad' },
+            { code: 'ST', name: 'Surat Jn', zone: 'WR - Western Railway', city: 'Surat' },
+            { code: 'BRC', name: 'Vadodara Jn', zone: 'WR - Western Railway', city: 'Vadodara' },
+            { code: 'JP', name: 'Jaipur Jn', zone: 'NWR - North Western', city: 'Jaipur' },
+            { code: 'JU', name: 'Jodhpur Jn', zone: 'NWR - North Western', city: 'Jodhpur' },
+            { code: 'UDZ', name: 'Udaipur City', zone: 'NWR - North Western', city: 'Udaipur' },
+            { code: 'KOTA', name: 'Kota Jn', zone: 'WCR - West Central', city: 'Kota' },
+            { code: 'RKMP', name: 'Rani Kamlapati (Bhopal)', zone: 'WCR - West Central', city: 'Bhopal' },
+            { code: 'INDB', name: 'Indore Jn', zone: 'WR - Western Railway', city: 'Indore' },
+            { code: 'GWL', name: 'Gwalior Jn', zone: 'NCR - North Central', city: 'Gwalior' },
+            { code: 'JBP', name: 'Jabalpur Jn', zone: 'WCR - West Central', city: 'Jabalpur' },
+            { code: 'NGP', name: 'Nagpur Jn', zone: 'CR - Central Railway', city: 'Nagpur' },
+
+            // Southern & South Western
+            { code: 'SBC', name: 'KSR Bengaluru City', zone: 'SWR - South Western', city: 'Bengaluru' },
+            { code: 'YPR', name: 'Yesvantpur Jn', zone: 'SWR - South Western', city: 'Bengaluru' },
+            { code: 'MAS', name: 'Puratchi Thalaivar Dr. MGR Chennai Central', zone: 'SR - Southern Railway', city: 'Chennai' },
+            { code: 'MS', name: 'Chennai Egmore', zone: 'SR - Southern Railway', city: 'Chennai' },
+            { code: 'CJB', name: 'Coimbatore Jn', zone: 'SR - Southern Railway', city: 'Coimbatore' },
+            { code: 'MDU', name: 'Madurai Jn', zone: 'SR - Southern Railway', city: 'Madurai' },
+            { code: 'TVC', name: 'Thiruvananthapuram Central', zone: 'SR - Southern Railway', city: 'Thiruvananthapuram' },
+            { code: 'ERS', name: 'Ernakulam Jn (Kochi)', zone: 'SR - Southern Railway', city: 'Kochi' },
+            { code: 'CLT', name: 'Kozhikode Jn (Calicut)', zone: 'SR - Southern Railway', city: 'Kozhikode' },
+
+            // South Central, East Coast, Northeast, Konkan
+            { code: 'SC', name: 'Secunderabad Jn', zone: 'SCR - South Central', city: 'Hyderabad' },
+            { code: 'HYB', name: 'Hyderabad Deccan (Nampally)', zone: 'SCR - South Central', city: 'Hyderabad' },
+            { code: 'BZA', name: 'Vijayawada Jn', zone: 'SCR - South Central', city: 'Vijayawada' },
+            { code: 'VSKP', name: 'Visakhapatnam Jn', zone: 'ECoR - East Coast', city: 'Visakhapatnam' },
+            { code: 'TPTY', name: 'Tirupati', zone: 'SCR - South Central', city: 'Tirupati' },
+            { code: 'BBS', name: 'Bhubaneswar', zone: 'ECoR - East Coast', city: 'Bhubaneswar' },
+            { code: 'PURI', name: 'Puri Terminus', zone: 'ECoR - East Coast', city: 'Puri' },
+            { code: 'GHY', name: 'Guwahati Jn', zone: 'NFR - Northeast Frontier', city: 'Guwahati' },
+            { code: 'MAO', name: 'Madgaon Jn (Goa)', zone: 'KR - Konkan Railway', city: 'Goa' },
+            { code: 'R', name: 'Raipur Jn', zone: 'SECR - South East Central', city: 'Raipur' }
+        ];
+        window.ALL_RAILWAY_STATIONS = ALL_RAILWAY_STATIONS;
+
+        function getTrainClassMultiplier(cls) {
+            const c = cls || '';
+            if (c.includes('1A') || c.includes('First Class')) return 2.2;
+            if (c.includes('2A') || c.includes('2 Tier')) return 1.5;
+            if (c.includes('Executive') || c.includes('EC') || c.includes('Exec.')) return 2.0;
+            if (c.includes('Chair Car') || c.includes('CC')) return 1.0;
+            if (c.includes('SL') || c.includes('Sleeper')) return 0.38;
+            return 1.0; // 3A standard
         }
+        window.getTrainClassMultiplier = getTrainClassMultiplier;
 
-        function toggleFlightSeat(seatNo) {
-            if (bookingState.selectedFlightSeats.includes(seatNo)) {
-                bookingState.selectedFlightSeats = bookingState.selectedFlightSeats.filter(s => s !== seatNo);
+        function getRouteTrainsCatalog(fromStr, toStr, trainClass) {
+            const fUpper = (fromStr || '').toUpperCase();
+            const tUpper = (toStr || '').toUpperCase();
+
+            const isDelhiKolkata = (fUpper.includes('NDLS') || fUpper.includes('DLI')) && (tUpper.includes('HWH') || tUpper.includes('SDAH'));
+            const isKolkataDelhi = (fUpper.includes('HWH') || fUpper.includes('SDAH')) && (tUpper.includes('NDLS') || tUpper.includes('DLI'));
+
+            const isDelhiMumbai = (fUpper.includes('NDLS') || fUpper.includes('NZM')) && (tUpper.includes('MMCT') || tUpper.includes('CSMT') || tUpper.includes('BDTS'));
+            const isMumbaiDelhi = (fUpper.includes('MMCT') || fUpper.includes('CSMT') || fUpper.includes('BDTS')) && (tUpper.includes('NDLS') || tUpper.includes('NZM'));
+
+            const isDelhiVaranasi = (fUpper.includes('NDLS') || fUpper.includes('ANVT')) && tUpper.includes('BSB');
+            const isVaranasiDelhi = fUpper.includes('BSB') && (tUpper.includes('NDLS') || tUpper.includes('ANVT'));
+
+            const isMumbaiGoa = (fUpper.includes('CSMT') || fUpper.includes('LTT')) && tUpper.includes('MAO');
+            const isGoaMumbai = fUpper.includes('MAO') && (tUpper.includes('CSMT') || tUpper.includes('LTT'));
+
+            const isHowrahPuri = fUpper.includes('HWH') && tUpper.includes('PURI');
+            const isPuriHowrah = fUpper.includes('PURI') && tUpper.includes('HWH');
+
+            const isBlrChennai = (fUpper.includes('SBC') || fUpper.includes('YPR')) && tUpper.includes('MAS');
+            const isChennaiBlr = tUpper.includes('MAS') && (fUpper.includes('SBC') || fUpper.includes('YPR'));
+
+            let trains = [];
+
+            if (isDelhiKolkata || isKolkataDelhi) {
+                trains = [
+                    { no: '12301', name: 'Rajdhani Express', dep: '16:55 NDLS', arr: '09:55 HWH', dur: '17h 00m', dist: '1450 km', base: 2850, avail: 'AVAILABLE (Seats: 48)' },
+                    { no: '12260', name: 'Sealdah Duronto Express', dep: '19:40 NDLS', arr: '12:45 SDAH', dur: '17h 05m', dist: '1455 km', base: 2650, avail: 'AVAILABLE (Seats: 62)' },
+                    { no: '12306', name: 'Poorva Express', dep: '17:40 NDLS', arr: '17:00 HWH', dur: '23h 20m', dist: '1530 km', base: 1980, avail: 'RAC 12' },
+                    { no: '12274', name: 'Howrah Duronto Express', dep: '12:40 NDLS', arr: '06:20 HWH', dur: '17h 40m', dist: '1450 km', base: 2700, avail: 'AVAILABLE (Seats: 35)' }
+                ];
+            } else if (isDelhiMumbai || isMumbaiDelhi) {
+                trains = [
+                    { no: '12952', name: 'Mumbai Rajdhani Express', dep: '16:55 MMCT', arr: '08:35 NDLS', dur: '15h 40m', dist: '1386 km', base: 2950, avail: 'AVAILABLE (Seats: 54)' },
+                    { no: '12954', name: 'August Kranti Rajdhani', dep: '17:10 MMCT', arr: '09:43 NZM', dur: '16h 33m', dist: '1378 km', base: 2850, avail: 'AVAILABLE (Seats: 70)' },
+                    { no: '12909', name: 'Garib Rath Express', dep: '17:30 BDTS', arr: '10:15 NZM', dur: '16h 45m', dist: '1366 km', base: 1450, avail: 'AVAILABLE (Seats: 112)' },
+                    { no: '12925', name: 'Paschim Superfast Express', dep: '11:25 MMCT', arr: '10:40 NDLS', dur: '23h 15m', dist: '1384 km', base: 1920, avail: 'AVAILABLE (Seats: 85)' }
+                ];
+            } else if (isDelhiVaranasi || isVaranasiDelhi) {
+                trains = [
+                    { no: '22436', name: 'Vande Bharat Express', dep: '06:00 NDLS', arr: '14:00 BSB', dur: '08h 00m', dist: '755 km', base: 1750, avail: 'AVAILABLE (Seats: 88)' },
+                    { no: '12560', name: 'Shiv Ganga Express', dep: '20:05 NDLS', arr: '06:10 BSB', dur: '10h 05m', dist: '758 km', base: 1650, avail: 'AVAILABLE (Seats: 42)' },
+                    { no: '12582', name: 'Banaras Superfast Express', dep: '22:50 NDLS', arr: '10:30 BSB', dur: '11h 40m', dist: '756 km', base: 1550, avail: 'AVAILABLE (Seats: 95)' }
+                ];
+            } else if (isMumbaiGoa || isGoaMumbai) {
+                trains = [
+                    { no: '22229', name: 'Goa Vande Bharat Express', dep: '05:25 CSMT', arr: '13:10 MAO', dur: '07h 45m', dist: '586 km', base: 1680, avail: 'AVAILABLE (Seats: 115)' },
+                    { no: '12051', name: 'Madgaon Jan Shatabdi Express', dep: '05:10 CSMT', arr: '14:15 MAO', dur: '09h 05m', dist: '580 km', base: 1120, avail: 'AVAILABLE (Seats: 48)' },
+                    { no: '10103', name: 'Mandovi Express', dep: '07:10 CSMT', arr: '19:10 MAO', dur: '12h 00m', dist: '580 km', base: 1350, avail: 'RAC 6' },
+                    { no: '12133', name: 'Mangaluru Superfast Express', dep: '22:02 CSMT', arr: '07:00 MAO', dur: '08h 58m', dist: '580 km', base: 1480, avail: 'AVAILABLE (Seats: 32)' }
+                ];
+            } else if (isHowrahPuri || isPuriHowrah) {
+                trains = [
+                    { no: '22895', name: 'Puri Vande Bharat Express', dep: '06:10 HWH', arr: '12:35 PURI', dur: '06h 25m', dist: '500 km', base: 1450, avail: 'AVAILABLE (Seats: 120)' },
+                    { no: '12837', name: 'Howrah - Puri Superfast Express', dep: '22:40 HWH', arr: '07:10 PURI', dur: '08h 30m', dist: '500 km', base: 1280, avail: 'AVAILABLE (Seats: 76)' },
+                    { no: '12881', name: 'Garib Rath Express', dep: '20:45 HWH', arr: '05:15 PURI', dur: '08h 30m', dist: '500 km', base: 920, avail: 'AVAILABLE (Seats: 64)' }
+                ];
+            } else if (isBlrChennai || isChennaiBlr) {
+                trains = [
+                    { no: '20608', name: 'Mysuru - Chennai Vande Bharat', dep: '14:50 SBC', arr: '19:20 MAS', dur: '04h 30m', dist: '359 km', base: 1200, avail: 'AVAILABLE (Seats: 145)' },
+                    { no: '12008', name: 'Shatabdi Express', dep: '16:25 SBC', arr: '21:30 MAS', dur: '05h 05m', dist: '359 km', base: 1080, avail: 'AVAILABLE (Seats: 82)' },
+                    { no: '12610', name: 'Chennai Intercity Express', dep: '08:00 SBC', arr: '14:30 MAS', dur: '06h 30m', dist: '359 km', base: 850, avail: 'AVAILABLE (Seats: 110)' }
+                ];
             } else {
-                bookingState.selectedFlightSeats.push(seatNo);
+                // Universal dynamic trains for ANY pair of stations in India
+                const fromCode = (fromStr.match(/\(([A-Z]+)\)/) || ['', 'FROM'])[1];
+                const toCode = (toStr.match(/\(([A-Z]+)\)/) || ['', 'TO'])[1];
+                trains = [
+                    { no: '20941', name: `Vande Bharat Express`, dep: `06:15 ${fromCode}`, arr: `13:45 ${toCode}`, dur: '07h 30m', dist: '680 km', base: 1650, avail: 'AVAILABLE (Seats: 94)' },
+                    { no: '12415', name: `Superfast Express`, dep: `16:20 ${fromCode}`, arr: `07:10 ${toCode}`, dur: '14h 50m', dist: '940 km', base: 1850, avail: 'AVAILABLE (Seats: 62)' },
+                    { no: '12381', name: `Rajdhani Connecting Express`, dep: `19:40 ${fromCode}`, arr: `11:15 ${toCode}`, dur: '15h 35m', dist: '1120 km', base: 2650, avail: 'AVAILABLE (Seats: 48)' },
+                    { no: '12209', name: `Garib Rath / Mail Express`, dep: `21:10 ${fromCode}`, arr: `14:20 ${toCode}`, dur: '17h 10m', dist: '980 km', base: 1320, avail: 'RAC 8' }
+                ];
+            }
+
+            return trains;
+        }
+        window.getRouteTrainsCatalog = getRouteTrainsCatalog;
+
+        function handleTrainRouteChange(type, value) {
+            if (type === 'from') bookingState.trainFrom = value;
+            if (type === 'to') bookingState.trainTo = value;
+
+            const trains = getRouteTrainsCatalog(bookingState.trainFrom, bookingState.trainTo, bookingState.trainClass);
+            if (trains && trains.length > 0) {
+                const top = trains[0];
+                bookingState.trainName = `${top.name} (${top.no})`;
+                bookingState.trainBasePrice = top.base;
             }
             renderApp();
         }
+        window.handleTrainRouteChange = handleTrainRouteChange;
 
-        function addFlightToCart() {
-            if (bookingState.selectedFlightSeats.length === 0) {
-                showToast('Please select at least 1 aircraft seat before booking!', 'warning');
+        function handleTrainClassChange(newClass) {
+            bookingState.trainClass = newClass;
+            bookingState.selectedTrainSeats = [];
+            renderApp();
+        }
+        window.handleTrainClassChange = handleTrainClassChange;
+
+        function selectScheduledTrain(trainName, trainNo, basePrice) {
+            bookingState.trainName = `${trainName} (${trainNo})`;
+            bookingState.trainBasePrice = basePrice;
+            showToast(`Selected ${trainName} (${trainNo}) on ${bookingState.trainDate}`, 'info');
+            renderApp();
+        }
+        window.selectScheduledTrain = selectScheduledTrain;
+
+        function toggleTrainSeat(seatNo) {
+            if (bookingState.selectedTrainSeats.includes(seatNo)) {
+                bookingState.selectedTrainSeats = bookingState.selectedTrainSeats.filter(s => s !== seatNo);
+            } else {
+                bookingState.selectedTrainSeats.push(seatNo);
+            }
+            renderApp();
+        }
+        window.toggleTrainSeat = toggleTrainSeat;
+
+        function addTrainToCart() {
+            if (bookingState.selectedTrainSeats.length === 0) {
+                showToast('Please select at least 1 railway berth/seat!', 'warning');
                 return;
             }
 
-            let classMultiplier = 1.0;
-            if (bookingState.flightClass === 'Premium Economy') classMultiplier = 1.4;
-            else if (bookingState.flightClass === 'Business') classMultiplier = 2.6;
-            else if (bookingState.flightClass === 'First Class Suite') classMultiplier = 4.5;
-
-            const unitFare = Math.round(bookingState.flightBasePrice * classMultiplier);
-            const totalFare = bookingState.selectedFlightSeats.length * unitFare;
+            const classMultiplier = getTrainClassMultiplier(bookingState.trainClass);
+            const unitFare = Math.round(bookingState.trainBasePrice * classMultiplier);
+            const totalFare = bookingState.selectedTrainSeats.length * unitFare;
             const custName = (state.currentUser && state.currentUser.name) ? state.currentUser.name : 'Bharat Astra VIP Guest';
 
             const bookingItem = {
-                id: `flight-${bookingState.flightNumber}-${Date.now()}`,
-                productId: `flight-${bookingState.flightNumber}`,
-                name: `[Flight] ${bookingState.flightAirline} (${bookingState.flightNumber}) • ${bookingState.flightFrom} ➔ ${bookingState.flightTo}`,
+                id: `train-${bookingState.trainName.replace(/[^a-zA-Z0-9]/g, '')}-${Date.now()}`,
+                productId: `train-res-${Date.now()}`,
+                name: `[IRCTC Train] ${bookingState.trainName} • ${bookingState.trainFrom} ➔ ${bookingState.trainTo}`,
                 price: totalFare,
-                originalPrice: Math.round(totalFare * 1.3),
-                image: 'https://images.unsplash.com/photo-1544016768-982d1554f0b9?w=500&auto=format&fit=crop&q=80',
-                size: `Class: ${bookingState.flightClass} • Date: ${bookingState.flightDate}`,
-                color: `Seats: ${bookingState.selectedFlightSeats.join(', ')}`,
+                originalPrice: Math.round(totalFare * 1.25),
+                image: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=500&auto=format&fit=crop&q=80',
+                size: `Class: ${bookingState.trainClass} • Date: ${bookingState.trainDate}`,
+                color: `Berths: ${bookingState.selectedTrainSeats.join(', ')}`,
                 storage: null,
                 quantity: 1,
                 category: 'Travel & Entertainment',
-                bookingType: 'flight',
+                bookingType: 'railway',
                 bookingDetails: {
-                    airline: bookingState.flightAirline,
-                    flightNo: bookingState.flightNumber,
-                    date: bookingState.flightDate,
-                    time: bookingState.flightTime,
-                    from: bookingState.flightFrom,
-                    to: bookingState.flightTo,
-                    class: bookingState.flightClass,
-                    seats: bookingState.selectedFlightSeats.join(', '),
+                    trainName: bookingState.trainName,
+                    date: bookingState.trainDate,
+                    class: bookingState.trainClass,
+                    from: bookingState.trainFrom,
+                    to: bookingState.trainTo,
+                    berths: bookingState.selectedTrainSeats.join(', '),
                     passenger: custName
                 }
             };
@@ -5342,9 +5629,234 @@
                 }
             });
 
-            showToast(`✈️ ${bookingState.flightAirline} confirmed for ${bookingState.selectedFlightSeats.length} passenger(s)!`, 'success');
+            showToast(`🚆 ${bookingState.trainName} e-Tickets added to cart!`, 'success');
             openCartDrawer();
         }
+        window.addTrainToCart = addTrainToCart;
+
+        function getTrainCoachAndLayout(trainClass) {
+            const cls = trainClass || 'AC 3 Tier (3A)';
+            if (cls.includes('1A') || cls.includes('First Class')) {
+                return {
+                    coach: 'Coach H1 (First Class AC • Private Coupe & Cabins)',
+                    bays: [
+                        { bay: 'Coupe A (2 Berths Private Sliding Door)', berths: ['1 (Lower)', '2 (Upper)'] },
+                        { bay: 'Cabin B (4 Berths Private Cabin)', berths: ['3 (Lower)', '4 (Upper)', '5 (Lower)', '6 (Upper)'] },
+                        { bay: 'Cabin C (4 Berths Private Cabin)', berths: ['7 (Lower)', '8 (Upper)', '9 (Lower)', '10 (Upper)'] }
+                    ]
+                };
+            } else if (cls.includes('2A') || cls.includes('2 Tier')) {
+                return {
+                    coach: 'Coach A1 (2-Tier AC Sleeper • No Middle Berths)',
+                    bays: [
+                        { bay: 'Bay 1 (Spacious 6 Berths)', berths: ['1 (Lower)', '2 (Upper)', '3 (Lower)', '4 (Upper)', '5 (Side Lower)', '6 (Side Upper)'] },
+                        { bay: 'Bay 2 (Spacious 6 Berths)', berths: ['7 (Lower)', '8 (Upper)', '9 (Lower)', '10 (Upper)', '11 (Side Lower)', '12 (Side Upper)'] },
+                        { bay: 'Bay 3 (Spacious 6 Berths)', berths: ['13 (Lower)', '14 (Upper)', '15 (Lower)', '16 (Upper)', '17 (Side Lower)', '18 (Side Upper)'] }
+                    ]
+                };
+            } else if (cls.includes('EC') || cls.includes('Executive') || cls.includes('Exec.')) {
+                return {
+                    coach: 'Coach E1 (Executive Chair Car • 2x2 Recliners)',
+                    bays: [
+                        { bay: 'Row 1', berths: ['1A (Window)', '1B (Aisle)', '1C (Aisle)', '1D (Window)'] },
+                        { bay: 'Row 2', berths: ['2A (Window)', '2B (Aisle)', '2C (Aisle)', '2D (Window)'] },
+                        { bay: 'Row 3', berths: ['3A (Window)', '3B (Aisle)', '3C (Aisle)', '3D (Window)'] },
+                        { bay: 'Row 4', berths: ['4A (Window)', '4B (Aisle)', '4C (Aisle)', '4D (Window)'] }
+                    ]
+                };
+            } else if (cls.includes('CC') || cls.includes('Chair Car')) {
+                return {
+                    coach: 'Coach C1 (AC Chair Car • 3x2 Seating)',
+                    bays: [
+                        { bay: 'Row 1', berths: ['1A (Window)', '1B (Middle)', '1C (Aisle)', '1D (Aisle)', '1E (Window)'] },
+                        { bay: 'Row 2', berths: ['2A (Window)', '2B (Middle)', '2C (Aisle)', '2D (Aisle)', '2E (Window)'] },
+                        { bay: 'Row 3', berths: ['3A (Window)', '3B (Middle)', '3C (Aisle)', '3D (Aisle)', '3E (Window)'] },
+                        { bay: 'Row 4', berths: ['4A (Window)', '4B (Middle)', '4C (Aisle)', '4D (Aisle)', '4E (Window)'] }
+                    ]
+                };
+            } else if (cls.includes('SL') || cls.includes('Sleeper')) {
+                return {
+                    coach: 'Coach S1 (Sleeper Class • Non-AC 8 Berths per Bay)',
+                    bays: [
+                        { bay: 'Bay 1', berths: ['1 (Lower)', '2 (Middle)', '3 (Upper)', '4 (Lower)', '5 (Middle)', '6 (Upper)', '7 (Side Lower)', '8 (Side Upper)'] },
+                        { bay: 'Bay 2', berths: ['9 (Lower)', '10 (Middle)', '11 (Upper)', '12 (Lower)', '13 (Middle)', '14 (Upper)', '15 (Side Lower)', '16 (Side Upper)'] }
+                    ]
+                };
+            } else {
+                return {
+                    coach: 'Coach B1 (3-Tier AC Sleeper • 8 Berths per Bay)',
+                    bays: [
+                        { bay: 'Bay 1', berths: ['1 (Lower)', '2 (Middle)', '3 (Upper)', '4 (Lower)', '5 (Middle)', '6 (Upper)', '7 (Side Lower)', '8 (Side Upper)'] },
+                        { bay: 'Bay 2', berths: ['9 (Lower)', '10 (Middle)', '11 (Upper)', '12 (Lower)', '13 (Middle)', '14 (Upper)', '15 (Side Lower)', '16 (Side Upper)'] },
+                        { bay: 'Bay 3', berths: ['17 (Lower)', '18 (Middle)', '19 (Upper)', '20 (Lower)', '21 (Middle)', '22 (Upper)', '23 (Side Lower)', '24 (Side Upper)'] }
+                    ]
+                };
+            }
+        }
+        window.getTrainCoachAndLayout = getTrainCoachAndLayout;
+
+        function renderTrainBookingHTML() {
+            const classMultiplier = getTrainClassMultiplier(bookingState.trainClass);
+            const trains = getRouteTrainsCatalog(bookingState.trainFrom, bookingState.trainTo, bookingState.trainClass);
+
+            let activeTrain = trains.find(t => bookingState.trainName.includes(t.name) || bookingState.trainName.includes(t.no));
+            if (!activeTrain) {
+                activeTrain = trains[0];
+                bookingState.trainName = `${activeTrain.name} (${activeTrain.no})`;
+                bookingState.trainBasePrice = activeTrain.base;
+            }
+
+            const unitFare = Math.round(bookingState.trainBasePrice * classMultiplier);
+            const totalFare = (bookingState.selectedTrainSeats.length || 1) * unitFare;
+
+            return `
+                <div style="background:white;border-radius:var(--radius-lg);border:1px solid var(--border);padding:2rem;margin-bottom:2rem;box-shadow:var(--shadow-sm);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem;">
+                        <div>
+                            <h3 style="font-size:1.3rem;font-weight:800;color:var(--secondary);margin:0;">
+                                <i class="fa-solid fa-train text-primary"></i> Indian Railway Express Reservation (All 18 Zones & Corridors)
+                            </h3>
+                            <p style="font-size:0.85rem;color:var(--text-muted);margin:0.25rem 0 0;">
+                                Official Indian Railway Reservation with Real-Time Service Schedules across all 45+ premier junction stations.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 24x7 Indian Railways & IRCTC Helplines Banner -->
+                    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+                        <div style="font-size:0.8rem;color:#991b1b;">
+                            <strong><i class="fa-solid fa-headset text-danger"></i> Official Railway & IRCTC Helplines:</strong>
+                            <span style="margin-left:0.5rem;">Rail Madad: <a href="tel:139" style="color:#b91c1c;font-weight:700;">139 (24x7)</a> &bull; IRCTC Customer Care: <a href="tel:07556610661" style="color:#b91c1c;font-weight:700;">0755-6610661</a> / <a href="tel:07554090400" style="color:#b91c1c;font-weight:700;">0755-4090400</a> &bull; Support: <a href="mailto:care@irctc.co.in" style="color:#991b1b;text-decoration:none;">care@irctc.co.in</a> &bull; RPF Security: <a href="tel:182" style="color:#b91c1c;font-weight:700;">182</a></span>
+                        </div>
+                        <span style="font-size:0.75rem;background:#991b1b;color:white;padding:0.25rem 0.6rem;border-radius:4px;font-weight:700;">
+                            Bharat Astra Rail Desk: 1800-266-9999 (Ext. 3)
+                        </span>
+                    </div>
+
+                    <!-- Search Fields -->
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1rem;margin-bottom:1.5rem;background:#f8fafc;padding:1.25rem;border-radius:var(--radius-md);border:1px solid var(--border);">
+                        <div>
+                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-location-dot text-primary"></i> From Station (Origin)
+                            </label>
+                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);font-size:0.85rem;" onchange="handleTrainRouteChange('from', this.value)">
+                                ${ALL_RAILWAY_STATIONS.map(s => `<option value="${s.name} (${s.code})" ${bookingState.trainFrom.includes(s.code)?'selected':''}>${s.name} (${s.code}) - ${s.city}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-location-dot text-primary"></i> To Station (Destination)
+                            </label>
+                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);font-size:0.85rem;" onchange="handleTrainRouteChange('to', this.value)">
+                                ${ALL_RAILWAY_STATIONS.map(s => `<option value="${s.name} (${s.code})" ${bookingState.trainTo.includes(s.code)?'selected':''}>${s.name} (${s.code}) - ${s.city}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-calendar text-primary"></i> Travel Date
+                            </label>
+                            <input type="date" value="${bookingState.trainDate}" class="form-control" style="width:100%;padding:0.5rem;border-radius:6px;border:1px solid var(--border);font-size:0.85rem;" onchange="bookingState.trainDate=this.value; renderApp();" />
+                        </div>
+
+                        <div>
+                            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-ticket text-primary"></i> Travel Class
+                            </label>
+                            <select class="form-control" style="width:100%;padding:0.55rem;border-radius:6px;border:1px solid var(--border);font-size:0.85rem;" onchange="handleTrainClassChange(this.value)">
+                                ${['AC 3 Tier (3A)', 'AC 2 Tier (2A)', 'AC 1st Class (1A)', 'Executive Chair Car (EC)', 'AC Chair Car (CC)', 'Sleeper (SL)'].map(c => `<option value="${c}" ${bookingState.trainClass===c?'selected':''}>${c}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Available Trains -->
+                    <div style="margin-bottom:1.5rem;">
+                        <h4 style="font-size:1rem;font-weight:800;color:var(--secondary);margin-bottom:0.75rem;">
+                            Available Indian Railway Services for ${bookingState.trainFrom} ➔ ${bookingState.trainTo} (${bookingState.trainDate})
+                        </h4>
+                        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                            ${trains.map(tr => {
+                                const fare = Math.round(tr.base * classMultiplier);
+                                const isSel = bookingState.trainName.includes(tr.name) || bookingState.trainName.includes(tr.no);
+                                return `
+                                    <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem;border:1.5px solid ${isSel ? 'var(--primary)' : 'var(--border)'};border-radius:8px;background:${isSel ? '#eff6ff' : 'white'};flex-wrap:wrap;gap:0.75rem;">
+                                        <div>
+                                            <strong style="font-size:1rem;color:var(--secondary);">${tr.name} (${tr.no})</strong>
+                                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem;">
+                                                ${tr.dep} ➔ ${tr.arr} • <strong>${tr.dur}</strong> • Distance: ${tr.dist}
+                                            </div>
+                                        </div>
+                                        <div style="display:flex;align-items:center;gap:1.5rem;">
+                                            <div style="text-align:right;">
+                                                <div style="font-size:1.15rem;font-weight:900;color:var(--secondary);">${formatINR(fare)}</div>
+                                                <span style="font-size:0.72rem;color:var(--success);font-weight:700;">${tr.avail}</span>
+                                            </div>
+                                            <button class="btn btn-sm ${isSel ? 'btn-primary' : 'btn-outline'}"
+                                                    onclick="selectScheduledTrain('${tr.name}', '${tr.no}', ${tr.base})">
+                                                ${isSel ? '<i class=\"fa-solid fa-check\"></i> Selected' : 'Choose Train'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Interactive Coach & Berth Map -->
+                    <div style="background:#f8fafc;padding:1.25rem;border-radius:var(--radius-md);border:1px solid var(--border);margin-bottom:1.5rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+                            <div>
+                                <h4 style="font-size:0.95rem;font-weight:800;color:var(--secondary);margin:0;">
+                                    <i class="fa-solid fa-chair text-primary"></i> Select Berths / Seats (${bookingState.trainClass})
+                                </h4>
+                                <span style="font-size:0.8rem;color:var(--text-muted);">
+                                    Active: ${bookingState.trainName} • ${getTrainCoachAndLayout(bookingState.trainClass).coach}
+                                </span>
+                            </div>
+                            <div style="font-size:0.85rem;font-weight:700;color:var(--primary);">
+                                Selected (${bookingState.selectedTrainSeats.length}): ${bookingState.selectedTrainSeats.join(', ') || 'None'}
+                            </div>
+                        </div>
+
+                        <!-- Class-Specific Berth / Seat Layout -->
+                        <div style="max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:0.75rem;">
+                            ${getTrainCoachAndLayout(bookingState.trainClass).bays.map(b => `
+                                <div style="background:white;padding:0.75rem 1rem;border-radius:8px;border:1px solid var(--border);">
+                                    <div style="font-size:0.75rem;font-weight:700;color:var(--text-muted);margin-bottom:0.5rem;text-transform:uppercase;">
+                                        ${b.bay}
+                                    </div>
+                                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                                        ${b.berths.map(berth => {
+                                            const isSel = bookingState.selectedTrainSeats.includes(berth);
+                                            return `
+                                                <button type="button" class="btn btn-sm"
+                                                        onclick="toggleTrainSeat('${berth}')"
+                                                        style="border-radius:6px;font-size:0.75rem;font-weight:700;padding:0.35rem 0.65rem;border:1.5px solid ${isSel ? 'var(--primary)' : 'var(--border)'};background:${isSel ? 'var(--primary)' : '#f8fafc'};color:${isSel ? 'white' : 'var(--secondary)'};cursor:pointer;transition:all 0.15s;">
+                                                    ${isSel ? '✓ ' : ''}${berth}
+                                                </button>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Fare & Checkout -->
+                    <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:1rem;flex-wrap:wrap;gap:1rem;">
+                        <div>
+                            <span style="font-size:0.8rem;color:var(--text-muted);">Total Railway Fare (${bookingState.selectedTrainSeats.length || 1} berth(s) • ${bookingState.trainClass}):</span>
+                            <div style="font-size:1.5rem;font-weight:900;color:var(--secondary);">${formatINR(totalFare)}</div>
+                        </div>
+                        <button class="btn btn-fk-buy btn-lg" onclick="addTrainToCart()">
+                            <i class="fa-solid fa-cart-shopping"></i> Add Train Reservation to Cart (${formatINR(totalFare)})
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        window.renderTrainBookingHTML = renderTrainBookingHTML;
 
         // ============================================================
         // E. 380+ HOTELS ACROSS INDIA WITH MULTI-ROOM & GUEST ALLOCATION
