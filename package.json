@@ -1,7 +1,7 @@
 {
-  "name": "bharatcart-nextgen",
+  "name": "bharat-astra",
   "version": "2.0.0",
-  "description": "BharatCart - Next-Gen E-Commerce & Service Ecosystem with FitVerse 3D Engine, 20,000+ SKU Catalog & Unified Booking",
+  "description": "Bharat Astra - Next-Generation Indian E-Commerce, Travel & Logistics Ecosystem",
   "main": "server.js",
   "scripts": {
     "dev": "node server.js",
@@ -12,10 +12,17 @@
   "keywords": [
     "ecommerce",
     "shopping-cart",
-    "fitverse",
+    "flights",
+    "railways",
+    "hotels",
+    "theaters",
     "gst-calculator",
-    "nextgen"
+    "bharat-astra"
   ],
-  "author": "BharatCart Retail Private Limited <support@bharatcart.in>",
+  "author": "Swapnaneel Naskar",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SwapnaneelNaskar/bharat-astra.git"
+  },
   "license": "MIT"
 }

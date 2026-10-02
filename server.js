@@ -76,12 +76,12 @@ function startServer(port) {
         const url = `http://localhost:${port}`;
         console.log('');
         console.log('  \x1b[36m=================================================================\x1b[0m');
-        console.log('  \x1b[1m\x1b[33m⚡ BHARATCART NEXT-GEN E-COMMERCE & SERVICE ECOSYSTEM\x1b[0m');
+        console.log('  \x1b[1m\x1b[33m⚡ BHARAT ASTRA - NEXT-GEN E-COMMERCE & LOGISTICS ECOSYSTEM\x1b[0m');
         console.log('  \x1b[36m=================================================================\x1b[0m');
         console.log(`  \x1b[32m➜  Local URL:\x1b[0m   \x1b[1m\x1b[4m${url}\x1b[0m`);
-        console.log(`  \x1b[35m➜  Customer:\x1b[0m    Swapnaneel Naskar (Registered Profile)`);
-        console.log(`  \x1b[34m➜  Catalog:\x1b[0m     20,480 SKUs across 9 Categories`);
-        console.log(`  \x1b[35m➜  FitVerse:\x1b[0m    Studio with Selective Shirts, Pants, Suits & Dresses`);
+        console.log(`  \x1b[35m➜  Developer:\x1b[0m   Swapnaneel Naskar`);
+        console.log(`  \x1b[34m➜  Catalog:\x1b[0m     177+ Products across 14 Categories`);
+        console.log(`  \x1b[35m➜  Travel:\x1b[0m      68 Airports & 62 Railway Stations`);
         console.log(`  \x1b[33m➜  GST Engine:\x1b[0m  18% Tax Calculation (CGST 9% + SGST 9%) & Invoicing`);
         console.log('  \x1b[36m=================================================================\x1b[0m');
         console.log('  \x1b[90mPress Ctrl+C in this terminal to stop the server.\x1b[0m\n');

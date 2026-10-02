@@ -19,10 +19,10 @@ public class BackendServer {
         server.setExecutor(null);
 
         System.out.println("=================================================================");
-        System.out.println("⚡ BharatCart Java Backend Web Service Running on Port " + port);
+        System.out.println("⚡ Bharat Astra Java Backend Web Service Running on Port " + port);
         System.out.println("➜ Local URL: http://localhost:" + port);
-        System.out.println("➜ Customer: Swapnaneel Naskar (Registered Profile)");
-        System.out.println("➜ Catalog:  20,480 SKUs Architecture & FitVerse Sizing Engine");
+        System.out.println("➜ Developer: Swapnaneel Naskar");
+        System.out.println("➜ Platform:  Bharat Astra Multi-Vertical Web Platform");
         System.out.println("=================================================================");
         System.out.println("Press Ctrl+C to stop the Java server.\n");
 
